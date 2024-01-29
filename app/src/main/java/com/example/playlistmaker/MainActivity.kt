@@ -1,8 +1,8 @@
 package com.example.playlistmaker
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 
@@ -16,26 +16,21 @@ class MainActivity : AppCompatActivity() {
         val settingsButton = findViewById<Button>(R.id.settings_button)
 
         //Listener implementation for search button
-        val searchButtonListener = object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                Toast.makeText(this@MainActivity, "Нажатие на кнопку поиска!", Toast.LENGTH_LONG).show()
-            }
+        searchButton.setOnClickListener {
+            val searchIntent = Intent(this@MainActivity, SearchActivity::class.java)
+            startActivity(searchIntent)
         }
-
-        searchButton.setOnClickListener(searchButtonListener)
 
         //Listener implementation for media button
         mediaButton.setOnClickListener {
-            Toast.makeText(this@MainActivity, "Нажатие на кнопку медитека!", Toast.LENGTH_SHORT).show()
+            val mediaIntent = Intent(this@MainActivity, MediaActivity::class.java)
+            startActivity(mediaIntent)
         }
 
         //Listener implementation for settings button
-        val settingsButtonListener = object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                Toast.makeText(this@MainActivity, "Нажатие на кнопку настроек!", Toast.LENGTH_LONG).show()
-            }
+        settingsButton.setOnClickListener {
+            val settingsIntent = Intent(this@MainActivity, SettingsActivity::class.java)
+            startActivity(settingsIntent)
         }
-
-        settingsButton.setOnClickListener(settingsButtonListener)
     }
 }
