@@ -1,56 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingStart="@dimen/padding_dimen"
-    android:paddingEnd="@dimen/elem_padding"
-    android:paddingTop="4dp"
     android:theme="@style/Theme.SettingsScreen">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/back_arrow"
-            android:layout_marginEnd="@dimen/elem_padding"
-            android:layout_marginVertical="@dimen/elem_padding"
-            android:src="@drawable/back_arrow"
-            style="@style/SettingsImageView"/>
-
-        <TextView
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/elem_padding"
-            android:text="@string/settings"
-            style="@style/Header" />
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/settings_header"
+        style="@style/Header"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginTop="14dp"
+        android:text="@string/settings" />
 
     <FrameLayout
+        android:id="@+id/night_theme_elem_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="49dp"
-        android:layout_marginBottom="@dimen/point_in_setting_padding">
+        android:layout_below="@+id/settings_header"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="61dp"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginEnd="@dimen/elem_padding">
 
         <TextView
+            style="@style/SettingsTextView"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:gravity="center"
-            android:text="@string/black_theme"
-            style="@style/SettingsTextView" />
+            android:text="@string/black_theme" />
 
         <Switch
             android:id="@+id/night_theme_switch"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
-            android:gravity="center"
             android:alpha="0.6"
+            android:gravity="center"
             android:thumb="@drawable/settings_switch_thumb_selector"
             app:track="@drawable/settings_switch_track_selector"
             tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
@@ -58,20 +49,70 @@
     </FrameLayout>
 
     <TextView
-        android:layout_marginBottom="@dimen/point_in_setting_padding"
-        android:text="@string/share_app"
+        android:id="@+id/share_app_textview"
+        style="@style/SettingsTextView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/night_theme_elem_layout"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginEnd="@dimen/elem_padding"
+        android:layout_marginTop="@dimen/point_in_setting_padding"
         app:drawableEndCompat="@drawable/share"
-        style="@style/SettingsTextView"/>
+        android:text="@string/share_app" />
 
     <TextView
-        android:layout_marginBottom="@dimen/point_in_setting_padding"
-        android:text="@string/write_to_support"
+        android:id="@+id/support_textview"
+        style="@style/SettingsTextView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/share_app_textview"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginEnd="@dimen/elem_padding"
+        android:layout_marginTop="@dimen/point_in_setting_padding"
         app:drawableEndCompat="@drawable/support"
-        style="@style/SettingsTextView" />
+        android:text="@string/write_to_support" />
 
     <TextView
-        android:text="@string/user_agreement"
+        android:id="@+id/user_agreement_textview"
+        style="@style/SettingsTextView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/support_textview"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginEnd="@dimen/elem_padding"
+        android:layout_marginTop="@dimen/point_in_setting_padding"
         app:drawableEndCompat="@drawable/right_arrow"
-        style="@style/SettingsTextView" />
+        android:text="@string/user_agreement" />
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/border_for_bottom_menu">
+
+        <Button
+            android:id="@+id/search_button"
+            style="@style/BottomMenuButton"
+            android:drawableTop="@drawable/search"
+            android:text="@string/search" />
+
+        <Button
+            android:id="@+id/media_button"
+            style="@style/BottomMenuButton"
+            android:drawableTop="@drawable/media"
+            android:text="@string/media" />
+
+        <Button
+            android:id="@+id/settings_button"
+            style="@style/BottomMenuButton"
+            android:enabled="false"
+            android:drawableTop="@drawable/settings"
+            android:text="@string/settings"
+            android:textColor="@color/yp_blue"
+            app:drawableTint="@color/yp_blue" />
+
+    </LinearLayout>
+
+</RelativeLayout>
