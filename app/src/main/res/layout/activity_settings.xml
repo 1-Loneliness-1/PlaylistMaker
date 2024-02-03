@@ -10,10 +10,6 @@
     <TextView
         android:id="@+id/settings_header"
         style="@style/Header"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="@dimen/padding_dimen"
-        android:layout_marginTop="14dp"
         android:text="@string/settings" />
 
     <FrameLayout
@@ -31,6 +27,8 @@
             style="@style/SettingsTextView"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/zero_dimen"
+            android:layout_marginTop="@dimen/zero_dimen"
             android:layout_gravity="center_vertical"
             android:gravity="center"
             android:text="@string/black_theme" />
@@ -51,36 +49,21 @@
     <TextView
         android:id="@+id/share_app_textview"
         style="@style/SettingsTextView"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/night_theme_elem_layout"
-        android:layout_marginStart="@dimen/padding_dimen"
-        android:layout_marginEnd="@dimen/elem_padding"
-        android:layout_marginTop="@dimen/point_in_setting_padding"
         app:drawableEndCompat="@drawable/share"
         android:text="@string/share_app" />
 
     <TextView
         android:id="@+id/support_textview"
         style="@style/SettingsTextView"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/share_app_textview"
-        android:layout_marginStart="@dimen/padding_dimen"
-        android:layout_marginEnd="@dimen/elem_padding"
-        android:layout_marginTop="@dimen/point_in_setting_padding"
         app:drawableEndCompat="@drawable/support"
         android:text="@string/write_to_support" />
 
     <TextView
         android:id="@+id/user_agreement_textview"
         style="@style/SettingsTextView"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/support_textview"
-        android:layout_marginStart="@dimen/padding_dimen"
-        android:layout_marginEnd="@dimen/elem_padding"
-        android:layout_marginTop="@dimen/point_in_setting_padding"
         app:drawableEndCompat="@drawable/right_arrow"
         android:text="@string/user_agreement" />
 
