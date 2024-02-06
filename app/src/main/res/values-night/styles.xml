@@ -16,6 +16,9 @@
         <item name="android:textFontWeight">400</item>
         <item name="drawableTint">@color/yp_white</item>
     </style>
+    <style name="SettingsImageView" parent="Theme.AppCompat.Light">
+        <item name="android:tint">@color/yp_white</item>
+    </style>
     <style name="Header" parent="Widget.MaterialComponents.TextView">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

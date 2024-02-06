@@ -7,9 +7,26 @@
     android:orientation="vertical"
     android:theme="@style/Theme.SettingsScreen">
 
+    <ImageView
+        android:id="@+id/back_to_main_screen_imageview"
+        style="@style/SettingsImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginTop="@dimen/padding_dimen"
+        android:src="@drawable/back_arrow" />
+
     <TextView
         android:id="@+id/settings_header"
         style="@style/Header"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
+        android:layout_alignTop="@+id/back_to_main_screen_imageview"
+        android:layout_alignBottom="@+id/back_to_main_screen_imageview"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="@dimen/zero_dimen"
+        android:layout_toEndOf="@+id/back_to_main_screen_imageview"
         android:text="@string/settings" />
 
     <FrameLayout
@@ -66,36 +83,5 @@
         android:layout_below="@id/support_textview"
         app:drawableEndCompat="@drawable/right_arrow"
         android:text="@string/user_agreement" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:background="@drawable/border_for_bottom_menu">
-
-        <Button
-            android:id="@+id/search_button"
-            style="@style/BottomMenuButton"
-            android:drawableTop="@drawable/search"
-            android:text="@string/search" />
-
-        <Button
-            android:id="@+id/media_button"
-            style="@style/BottomMenuButton"
-            android:drawableTop="@drawable/media"
-            android:text="@string/media" />
-
-        <Button
-            android:id="@+id/settings_button"
-            style="@style/BottomMenuButton"
-            android:enabled="false"
-            android:drawableTop="@drawable/settings"
-            android:text="@string/settings"
-            android:textColor="@color/yp_blue"
-            app:drawableTint="@color/yp_blue" />
-
-    </LinearLayout>
 
 </RelativeLayout>

@@ -18,6 +18,9 @@
         <item name="backgroundTint">@color/yp_white</item>
         <item name="elevation">@dimen/zero_dimen</item>
     </style>
+    <style name="SettingsImageView" parent="Theme.AppCompat.Light">
+        <item name="android:tint">@color/yp_black</item>
+    </style>
     <style name="SettingsTextView" parent="Widget.MaterialComponents.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
