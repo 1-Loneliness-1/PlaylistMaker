@@ -2,7 +2,7 @@
     <style name="Theme.MainScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:background">@color/yp_blue</item>
     </style>
-    <style name="Theme.SettingsScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.DayNightScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:background">@color/yp_white</item>
     </style>
 </resources>
