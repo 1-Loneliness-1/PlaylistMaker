@@ -11,12 +11,20 @@ import android.widget.EditText
 import android.widget.ImageView
 
 class SearchActivity : AppCompatActivity() {
+
+    private lateinit var searchEditText: EditText
+    private var currentTextInEditText: String? = ""
+
+    companion object {
+        const val TEXT_IN_SEARCH_EDIT_TEXT = "TEXT_IN_SEARCH_EDIT_TEXT"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val backToPreviousScreenButton = findViewById<ImageView>(R.id.back_button)
-        val searchEditText = findViewById<EditText>(R.id.search_edit_text)
+        searchEditText = findViewById(R.id.search_edit_text)
         val clearSearchEditTextButton = findViewById<ImageView>(R.id.clear_edit_text_button)
 
         backToPreviousScreenButton.setOnClickListener { finish() }
@@ -44,10 +52,25 @@ class SearchActivity : AppCompatActivity() {
                 } else {
                     clearSearchEditTextButton.visibility = View.VISIBLE
                 }
+
+                //Saving current text in edit text in variable for putting in Instance State
+                currentTextInEditText = s.toString()
             }
         }
 
         searchEditText.addTextChangedListener(searchEditTextListener)
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString(TEXT_IN_SEARCH_EDIT_TEXT, currentTextInEditText)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        currentTextInEditText = savedInstanceState.getString(TEXT_IN_SEARCH_EDIT_TEXT)
+        searchEditText.setText(currentTextInEditText)
     }
 }

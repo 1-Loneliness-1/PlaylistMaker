@@ -51,9 +51,8 @@
         <item name="iconPadding">2dp</item>
     </style>
     <style name="SearchElement" parent="Widget.AppCompat.EditText" >
-        <item name="android:layout_width">@dimen/zero_dimen</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
         <item name="android:drawablePadding">@dimen/icon_padding</item>
         <item name="android:background">@drawable/background_for_search_edit_text</item>
         <item name="android:backgroundTint">@color/yp_white</item>

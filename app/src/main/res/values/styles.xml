@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="MainScreenButton" parent="Widget.MaterialComponents.Button">
+    <style name="MainScreenButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/zero_dimen</item>
         <item name="android:layout_weight">1</item>
@@ -16,7 +16,6 @@
         <item name="iconTint">@color/yp_black</item>
         <item name="cornerRadius">@dimen/padding_dimen</item>
         <item name="backgroundTint">@color/yp_white</item>
-        <item name="elevation">@dimen/zero_dimen</item>
     </style>
     <style name="BackArrow" parent="Theme.AppCompat.Light">
         <item name="android:layout_width">wrap_content</item>
@@ -69,9 +68,8 @@
         <item name="iconPadding">2dp</item>
     </style>
     <style name="SearchElement" parent="Widget.AppCompat.EditText" >
-        <item name="android:layout_width">@dimen/zero_dimen</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
         <item name="android:drawablePadding">@dimen/icon_padding</item>
         <item name="android:background">@drawable/background_for_search_edit_text</item>
         <item name="android:backgroundTint">@color/yp_light_gray</item>
