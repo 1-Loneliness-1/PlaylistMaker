@@ -12,7 +12,7 @@ import android.widget.ImageView
 
 class SearchActivity : AppCompatActivity() {
 
-    private lateinit var searchEditText: EditText
+    private var searchEditText: EditText? = null
     private var currentTextInEditText: String? = ""
 
     companion object {
@@ -30,9 +30,9 @@ class SearchActivity : AppCompatActivity() {
         backToPreviousScreenButton.setOnClickListener { finish() }
 
         clearSearchEditTextButton.setOnClickListener {
-            searchEditText.setText("")
+            searchEditText?.setText("")
             clearSearchEditTextButton.visibility = View.GONE
-            searchEditText.clearFocus()
+            searchEditText?.clearFocus()
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
         }
@@ -58,7 +58,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        searchEditText.addTextChangedListener(searchEditTextListener)
+        searchEditText?.addTextChangedListener(searchEditTextListener)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -71,6 +71,6 @@ class SearchActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
 
         currentTextInEditText = savedInstanceState.getString(TEXT_IN_SEARCH_EDIT_TEXT)
-        searchEditText.setText(currentTextInEditText)
+        searchEditText?.setText(currentTextInEditText)
     }
 }

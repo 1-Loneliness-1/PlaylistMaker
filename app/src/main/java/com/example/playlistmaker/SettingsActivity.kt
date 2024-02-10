@@ -27,12 +27,12 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         writeToSupportButton.setOnClickListener {
-            val writeToSupportIntent = Intent(Intent.ACTION_SENDTO)
+            val writeToSupportIntent = Intent(Intent.ACTION_SEND)
             writeToSupportIntent.setType("message/rfc822")
                 .putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.my_email)) )
                 .putExtra(Intent.EXTRA_SUBJECT, getString(R.string.message_for_android_developers))
                 .putExtra(Intent.EXTRA_TEXT, getString(R.string.acknowledge_for_android_dev))
-            startActivity(writeToSupportIntent)
+            startActivity(Intent.createChooser(writeToSupportIntent, getString(R.string.write_to_support)))
         }
 
         userAgreementButton.setOnClickListener {
