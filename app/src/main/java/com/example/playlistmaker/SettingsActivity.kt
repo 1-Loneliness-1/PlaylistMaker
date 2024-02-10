@@ -12,10 +12,10 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val backToMainScreenButton = findViewById<ImageView>(R.id.back_to_main_screen_imageview)
-        val shareAppButton = findViewById<TextView>(R.id.share_app_textview)
-        val writeToSupportButton = findViewById<TextView>(R.id.support_textview)
-        val userAgreementButton = findViewById<TextView>(R.id.user_agreement_textview)
+        val backToMainScreenButton = findViewById<ImageView>(R.id.ivBackToMainScreen)
+        val shareAppButton = findViewById<TextView>(R.id.tvShareApp)
+        val writeToSupportButton = findViewById<TextView>(R.id.tvSupport)
+        val userAgreementButton = findViewById<TextView>(R.id.tvUserAgreement)
 
         backToMainScreenButton.setOnClickListener { finish() }
 

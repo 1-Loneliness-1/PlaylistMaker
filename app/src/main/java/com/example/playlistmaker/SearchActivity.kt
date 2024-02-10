@@ -9,6 +9,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 
 class SearchActivity : AppCompatActivity() {
 
@@ -23,42 +25,26 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val backToPreviousScreenButton = findViewById<ImageView>(R.id.back_button)
-        searchEditText = findViewById(R.id.search_edit_text)
-        val clearSearchEditTextButton = findViewById<ImageView>(R.id.clear_edit_text_button)
+        val backToPreviousScreenButton = findViewById<ImageView>(R.id.ivBackToPreviousScreen)
+        searchEditText = findViewById(R.id.etSearch)
+        val clearSearchEditTextButton = findViewById<ImageView>(R.id.ivClearEditText)
 
         backToPreviousScreenButton.setOnClickListener { finish() }
 
         clearSearchEditTextButton.setOnClickListener {
             searchEditText?.setText("")
-            clearSearchEditTextButton.visibility = View.GONE
+            clearSearchEditTextButton.isVisible = false
             searchEditText?.clearFocus()
             val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
         }
 
-        val searchEditTextListener = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        searchEditText?.doOnTextChanged { text, start, before, count ->
+            clearSearchEditTextButton.isVisible = !text.isNullOrEmpty()
 
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (s.isNullOrEmpty()) {
-                    clearSearchEditTextButton.visibility = View.GONE
-                } else {
-                    clearSearchEditTextButton.visibility = View.VISIBLE
-                }
-
-                //Saving current text in edit text in variable for putting in Instance State
-                currentTextInEditText = s.toString()
-            }
+            //Saving current text in edit text in variable for putting in Instance State
+            currentTextInEditText = text.toString()
         }
-
-        searchEditText?.addTextChangedListener(searchEditTextListener)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

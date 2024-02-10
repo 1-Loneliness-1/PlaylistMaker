@@ -24,21 +24,21 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/search_button"
+            android:id="@+id/bSearch"
             style="@style/MainScreenButton"
             android:layout_marginBottom="@dimen/padding_dimen"
             android:text="@string/search"
             app:icon="@drawable/search" />
 
         <Button
-            android:id="@+id/media_button"
+            android:id="@+id/bMedia"
             style="@style/MainScreenButton"
             android:layout_marginBottom="@dimen/padding_dimen"
             android:text="@string/media"
             app:icon="@drawable/media" />
 
         <Button
-            android:id="@+id/settings_button"
+            android:id="@+id/bSettings"
             style="@style/MainScreenButton"
             android:text="@string/settings"
             app:icon="@drawable/settings" />

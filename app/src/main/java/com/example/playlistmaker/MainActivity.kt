@@ -4,16 +4,15 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val searchButton = findViewById<Button>(R.id.search_button)
-        val mediaButton = findViewById<Button>(R.id.media_button)
-        val settingsButton = findViewById<Button>(R.id.settings_button)
+        val searchButton = findViewById<Button>(R.id.bSearch)
+        val mediaButton = findViewById<Button>(R.id.bMedia)
+        val settingsButton = findViewById<Button>(R.id.bSettings)
 
         //Listener implementation for search button
         searchButton.setOnClickListener {

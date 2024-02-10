@@ -8,23 +8,23 @@
     android:theme="@style/Theme.DayNightScreen">
 
     <ImageView
-        android:id="@+id/back_to_main_screen_imageview"
+        android:id="@+id/ivBackToMainScreen"
         style="@style/BackArrow"
         tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/settings_header"
+        android:id="@+id/tvSettingsHeader"
         style="@style/Header"
-        android:layout_alignTop="@+id/back_to_main_screen_imageview"
-        android:layout_alignBottom="@+id/back_to_main_screen_imageview"
-        android:layout_toEndOf="@+id/back_to_main_screen_imageview"
+        android:layout_alignTop="@+id/ivBackToMainScreen"
+        android:layout_alignBottom="@+id/ivBackToMainScreen"
+        android:layout_toEndOf="@+id/ivBackToMainScreen"
         android:text="@string/settings" />
 
     <FrameLayout
-        android:id="@+id/night_theme_elem_layout"
+        android:id="@+id/flNightThemeSwitcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/settings_header"
+        android:layout_below="@+id/tvSettingsHeader"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="61dp"
@@ -42,7 +42,7 @@
             android:text="@string/black_theme" />
 
         <Switch
-            android:id="@+id/night_theme_switch"
+            android:id="@+id/sNightTheme"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end"
@@ -55,23 +55,23 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/share_app_textview"
+        android:id="@+id/tvShareApp"
         style="@style/SettingsTextView"
-        android:layout_below="@id/night_theme_elem_layout"
+        android:layout_below="@id/flNightThemeSwitcher"
         app:drawableEndCompat="@drawable/share"
         android:text="@string/share_app" />
 
     <TextView
-        android:id="@+id/support_textview"
+        android:id="@+id/tvSupport"
         style="@style/SettingsTextView"
-        android:layout_below="@id/share_app_textview"
+        android:layout_below="@id/tvShareApp"
         app:drawableEndCompat="@drawable/support"
         android:text="@string/write_to_support" />
 
     <TextView
-        android:id="@+id/user_agreement_textview"
+        android:id="@+id/tvUserAgreement"
         style="@style/SettingsTextView"
-        android:layout_below="@id/support_textview"
+        android:layout_below="@id/tvSupport"
         app:drawableEndCompat="@drawable/right_arrow"
         android:text="@string/user_agreement" />
 
