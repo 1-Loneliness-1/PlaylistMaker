@@ -1,18 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/padding_dimen"
+    android:paddingHorizontal="@dimen/padding_dimen"
+    android:theme="@style/Theme.MainScreen">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        style="@style/Header"
+        android:layout_marginStart="@dimen/zero_dimen"
+        android:layout_marginTop="14dp"
+        android:text="@string/app_name_capitalize"
+        android:textColor="@color/yp_white" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="12dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/bSearch"
+            style="@style/MainScreenButton"
+            android:layout_marginBottom="@dimen/padding_dimen"
+            android:text="@string/search"
+            app:icon="@drawable/search" />
+
+        <Button
+            android:id="@+id/bMedia"
+            style="@style/MainScreenButton"
+            android:layout_marginBottom="@dimen/padding_dimen"
+            android:text="@string/media"
+            app:icon="@drawable/media" />
+
+        <Button
+            android:id="@+id/bSettings"
+            style="@style/MainScreenButton"
+            android:text="@string/settings"
+            app:icon="@drawable/settings" />
+
+    </LinearLayout>
+
+</LinearLayout>

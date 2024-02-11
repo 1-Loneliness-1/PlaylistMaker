@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.DayNightScreen"
+    tools:context=".SearchActivity">
+
+    <ImageView
+        android:id="@+id/ivBackToPreviousScreen"
+        style="@style/BackArrow"
+        android:src="@drawable/back_arrow"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/tvSearchHeader"
+        style="@style/Header"
+        android:layout_alignTop="@+id/ivBackToPreviousScreen"
+        android:layout_alignBottom="@+id/ivBackToPreviousScreen"
+        android:layout_toEndOf="@+id/ivBackToPreviousScreen"
+        android:text="@string/search" />
+
+    <FrameLayout
+        android:id="@+id/flSearch"
+        style="@style/SearchElement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/zero_dimen"
+        android:paddingVertical="@dimen/zero_dimen"
+        android:layout_below="@+id/ivBackToPreviousScreen"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginHorizontal="@dimen/padding_dimen"
+        android:layout_marginTop="@dimen/icon_size">
+
+        <EditText
+            android:id="@+id/etSearch"
+            style="@style/SearchElement"
+            android:drawableStart="@drawable/search"
+            android:hint="@string/search"
+            android:inputType="textAutoCorrect"
+            android:maxLines="1" />
+
+        <ImageView
+            android:id="@+id/ivClearEditText"
+            style="@style/DayNightElement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/elem_padding"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/close"
+            android:visibility="gone"
+            android:backgroundTint="@android:color/transparent" />
+
+    </FrameLayout>
+
+</RelativeLayout>

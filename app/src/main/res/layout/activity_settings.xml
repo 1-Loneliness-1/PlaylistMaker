@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:theme="@style/Theme.DayNightScreen">
+
+    <ImageView
+        android:id="@+id/ivBackToMainScreen"
+        style="@style/BackArrow"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/tvSettingsHeader"
+        style="@style/Header"
+        android:layout_alignTop="@+id/ivBackToMainScreen"
+        android:layout_alignBottom="@+id/ivBackToMainScreen"
+        android:layout_toEndOf="@+id/ivBackToMainScreen"
+        android:text="@string/settings" />
+
+    <FrameLayout
+        android:id="@+id/flNightThemeSwitcher"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvSettingsHeader"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="61dp"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginEnd="@dimen/elem_padding">
+
+        <TextView
+            style="@style/SettingsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/zero_dimen"
+            android:layout_marginTop="@dimen/zero_dimen"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:text="@string/black_theme" />
+
+        <Switch
+            android:id="@+id/sNightTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:alpha="0.6"
+            android:gravity="center"
+            android:thumb="@drawable/settings_switch_thumb_selector"
+            app:track="@drawable/settings_switch_track_selector"
+            tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvShareApp"
+        style="@style/SettingsTextView"
+        android:layout_below="@id/flNightThemeSwitcher"
+        app:drawableEndCompat="@drawable/share"
+        android:text="@string/share_app" />
+
+    <TextView
+        android:id="@+id/tvSupport"
+        style="@style/SettingsTextView"
+        android:layout_below="@id/tvShareApp"
+        app:drawableEndCompat="@drawable/support"
+        android:text="@string/write_to_support" />
+
+    <TextView
+        android:id="@+id/tvUserAgreement"
+        style="@style/SettingsTextView"
+        android:layout_below="@id/tvSupport"
+        app:drawableEndCompat="@drawable/right_arrow"
+        android:text="@string/user_agreement" />
+
+</RelativeLayout>
