@@ -1,8 +1,9 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Theme.MainScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:background">@color/yp_black</item>
     </style>
     <style name="Theme.DayNightScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:background">@color/yp_black</item>
+        <item name="colorOfRightArrow">@color/yp_white</item>
     </style>
 </resources>

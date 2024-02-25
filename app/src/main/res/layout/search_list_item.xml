@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="13dp"
+    android:paddingEnd="12dp"
+    android:paddingVertical="@dimen/icon_padding">
+
+    <ImageView
+        android:id="@+id/ivTrackCover"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        tools:src="@drawable/background_for_search_edit_text" />
+
+    <TextView
+        android:id="@+id/tvTrackName"
+        style="@style/SettingsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/ivTrackCover"
+        android:layout_toStartOf="@id/ivDecorativeArrow"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="false"
+        android:layout_marginStart="@dimen/icon_padding"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="24dp"
+        android:layout_toEndOf="@+id/ivTrackCover"
+        android:ellipsize="end"
+        android:maxLines="1"
+        tools:text="Название песни для примера" />
+
+    <TextView
+        android:id="@+id/tvArtistName"
+        style="@style/TrackListTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvTrackName"
+        android:layout_alignStart="@+id/tvTrackName"
+        android:layout_alignBottom="@+id/ivTrackCover"
+        android:layout_marginBottom="7dp"
+        tools:text="The somers" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tvArtistName"
+        android:layout_toEndOf="@+id/tvArtistName"
+        android:backgroundTint="@android:color/transparent"
+        android:src="@drawable/ic"
+        android:theme="@style/Theme.DayNightScreen"
+        app:tint="?attr/colorOfRightArrow" />
+
+    <TextView
+        android:id="@+id/tvTrackTime"
+        style="@style/TrackListTextView"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/imageView"
+        android:layout_toEndOf="@+id/imageView"
+        tools:text="4:59" />
+
+    <ImageView
+        android:id="@+id/ivDecorativeArrow"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_alignTop="@+id/tvTrackName"
+        android:layout_alignBottom="@+id/tvTrackTime"
+        android:layout_alignParentEnd="true"
+        android:backgroundTint="@android:color/transparent"
+        android:src="@drawable/right_arrow"
+        android:theme="@style/Theme.DayNightScreen"
+        app:tint="?attr/colorOfRightArrow" />
+
+</RelativeLayout>
