@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="13dp"
-    android:paddingEnd="12dp"
+    android:paddingHorizontal="@dimen/elem_padding"
     android:paddingVertical="@dimen/icon_padding">
 
     <ImageView
@@ -31,43 +30,51 @@
         android:maxLines="1"
         tools:text="Название песни для примера" />
 
-    <TextView
-        android:id="@+id/tvArtistName"
-        style="@style/TrackListTextView"
+    <LinearLayout
+        android:id="@+id/llTrackInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvTrackName"
         android:layout_alignStart="@+id/tvTrackName"
-        android:layout_alignBottom="@+id/ivTrackCover"
-        android:layout_marginBottom="7dp"
-        tools:text="The somers" />
+        android:layout_alignEnd="@+id/tvTrackName"
+        android:layout_marginEnd="@dimen/icon_size"
+        android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/tvArtistName"
-        android:layout_toEndOf="@+id/tvArtistName"
-        android:backgroundTint="@android:color/transparent"
-        android:src="@drawable/ic"
-        android:theme="@style/Theme.DayNightScreen"
-        app:tint="?attr/colorOfRightArrow" />
+        <TextView
+            android:id="@+id/tvArtistName"
+            style="@style/TrackListTextView"
+            android:layout_width="wrap_content"
+            android:maxWidth="110dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            tools:text="The somers" />
 
-    <TextView
-        android:id="@+id/tvTrackTime"
-        style="@style/TrackListTextView"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/imageView"
-        android:layout_toEndOf="@+id/imageView"
-        tools:text="4:59" />
+        <ImageView
+            android:id="@+id/ivDot"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/ic"
+            android:theme="@style/Theme.DayNightScreen"
+            app:tint="?attr/colorOfRightArrow" />
+
+        <TextView
+            android:id="@+id/tvTrackTime"
+            style="@style/TrackListTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            tools:text="4:59" />
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/ivDecorativeArrow"
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"
         android:layout_alignTop="@+id/tvTrackName"
-        android:layout_alignBottom="@+id/tvTrackTime"
+        android:layout_alignBottom="@+id/llTrackInfo"
         android:layout_alignParentEnd="true"
         android:backgroundTint="@android:color/transparent"
         android:src="@drawable/right_arrow"

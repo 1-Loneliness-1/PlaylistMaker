@@ -2,21 +2,14 @@ package com.example.playlistmaker
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.model.Track
-import com.example.playlistmaker.utils.DimenConvertor
 
 class SearchActivity : AppCompatActivity() {
 
@@ -86,7 +79,7 @@ class SearchActivity : AppCompatActivity() {
             currentTextInEditText = text.toString()
         }
 
-        searchTracksRecycler.adapter = SearchAdapter(trackList)
+        searchTracksRecycler.adapter = TrackAdapter(trackList)
 
     }
 
@@ -101,42 +94,6 @@ class SearchActivity : AppCompatActivity() {
 
         currentTextInEditText = savedInstanceState.getString(TEXT_IN_SEARCH_EDIT_TEXT)
         searchEditText?.setText(currentTextInEditText)
-    }
-
-    //Implementation of ViewHolder and Adapter classes for recyclerview with results of track search
-    private class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val songCover = itemView.findViewById<ImageView>(R.id.ivTrackCover)
-        private val trackName = itemView.findViewById<TextView>(R.id.tvTrackName)
-        private val artistName = itemView.findViewById<TextView>(R.id.tvArtistName)
-        private val trackTime = itemView.findViewById<TextView>(R.id.tvTrackTime)
-
-        fun bind(model: Track) {
-            Glide.with(itemView)
-                .load(model.artworkUrl100)
-                .placeholder(R.drawable.song_cover_placeholder)
-                .centerCrop()
-                .transform(RoundedCorners(DimenConvertor.dpToPx(2f, itemView.context)))
-                .into(songCover)
-            trackName.text = model.trackName
-            artistName.text = if (model.artistName.length > 20) model.artistName.take(20)
-                .plus("...") else model.artistName
-            trackTime.text = model.trackTime
-        }
-    }
-
-    private class SearchAdapter(
-        private val tracks: List<Track>
-    ) : RecyclerView.Adapter<SearchViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SearchViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.search_list_item, parent, false)
-        )
-
-        override fun getItemCount() = tracks.size
-
-        override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
-            holder.bind(tracks[position])
-        }
-
     }
 
 }
