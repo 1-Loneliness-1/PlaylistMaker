@@ -10,6 +10,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.model.Track
 import com.example.playlistmaker.utils.DimenConvertor
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TrackAdapter(
     private val tracks: List<Track>
@@ -40,7 +42,8 @@ class TrackAdapter(
                 .into(songCover)
             trackName.text = model.trackName
             artistName.text = model.artistName
-            trackTime.text = model.trackTime
+            trackTime.text =
+                SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
         }
     }
 
