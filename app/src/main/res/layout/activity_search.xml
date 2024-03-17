@@ -40,7 +40,10 @@
             android:drawableStart="@drawable/search"
             android:hint="@string/search"
             android:inputType="textAutoCorrect"
-            android:maxLines="1" />
+            android:textColor="@color/yp_black"
+            android:maxLines="1"
+            android:imeOptions="actionDone"
+            android:singleLine="true" />
 
         <ImageView
             android:id="@+id/ivClearEditText"
@@ -65,5 +68,70 @@
         android:layout_alignParentBottom="true"
         android:layout_marginTop="@dimen/icon_size"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <ImageView
+        android:id="@+id/ivNothingFoundPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flSearch"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginHorizontal="120dp"
+        android:layout_marginTop="90dp"
+        android:src="?attr/foundNothingPlaceholder"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/ivNoInternetPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/flSearch"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginHorizontal="120dp"
+        android:layout_marginTop="90dp"
+        android:src="?attr/noInternetPlaceholder"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvErrorNothingFound"
+        style="@style/ErrorTextForPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/icon_size"
+        android:layout_marginTop="@dimen/padding_dimen"
+        android:layout_below="@+id/ivNothingFoundPlaceholder"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:text="@string/error_found_nothing"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvErrorNoInternet"
+        style="@style/ErrorTextForPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/icon_size"
+        android:layout_marginTop="@dimen/padding_dimen"
+        android:layout_below="@+id/ivNoInternetPlaceholder"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:text="@string/error_no_internet"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/bRefreshRequest"
+        style="@style/RefreshButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="14dp"
+        android:layout_marginHorizontal="125dp"
+        android:layout_marginTop="@dimen/icon_size"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/tvErrorNoInternet"
+        android:text="@string/refresh"
+        android:visibility="gone" />
 
 </RelativeLayout>

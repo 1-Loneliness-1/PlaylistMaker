@@ -6,6 +6,7 @@
     <dimen name="point_in_setting_padding">42dp</dimen>
     <dimen name="basic_text_size">22sp</dimen>
     <dimen name="smaller_text_size">16sp</dimen>
+    <dimen name="text_size_for_error">19sp</dimen>
     <dimen name="zero_dimen">0dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <dimen name="bottom_menu_text_size">12sp</dimen>
