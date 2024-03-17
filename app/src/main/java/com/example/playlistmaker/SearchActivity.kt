@@ -22,11 +22,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
-    private val adapter = TrackAdapter(trackList)
-
-    private val itunesBaseUrl = "https://itunes.apple.com"
     private val retrofit = Retrofit.Builder()
-        .baseUrl(itunesBaseUrl)
+        .baseUrl(ITUNES_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     private val itunesService = retrofit.create(ItunesApiService::class.java)
@@ -44,6 +41,8 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         const val TEXT_IN_SEARCH_EDIT_TEXT = "TEXT_IN_SEARCH_EDIT_TEXT"
         private val trackList = ArrayList<Track>()
+        private const val ITUNES_BASE_URL = "https://itunes.apple.com"
+        private val ADAPTER = TrackAdapter(trackList)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,7 +59,7 @@ class SearchActivity : AppCompatActivity() {
         errorNoInternetText = findViewById(R.id.tvErrorNoInternet)
         refreshButton = findViewById(R.id.bRefreshRequest)
 
-        searchTracksRecycler.adapter = adapter
+        searchTracksRecycler.adapter = ADAPTER
 
         backToPreviousScreenButton.setOnClickListener { finish() }
 
@@ -80,7 +79,7 @@ class SearchActivity : AppCompatActivity() {
             errorNoInternetText?.isVisible = false
             refreshButton?.isVisible = false
             trackList.clear()
-            adapter.notifyDataSetChanged()
+            ADAPTER.notifyDataSetChanged()
         }
 
         searchEditText?.doOnTextChanged { text, _, _, _ ->
@@ -124,7 +123,7 @@ class SearchActivity : AppCompatActivity() {
                     if (response.code() == 200) {
                         trackList.clear()
                         trackList.addAll(response.body()?.results!!)
-                        adapter.notifyDataSetChanged()
+                        ADAPTER.notifyDataSetChanged()
 
                         searchEditText?.isFocusableInTouchMode = true
                         clearSearchEditTextButton?.isEnabled = true
@@ -137,7 +136,7 @@ class SearchActivity : AppCompatActivity() {
                         refreshButton?.isVisible = false
                     } else {
                         trackList.clear()
-                        adapter.notifyDataSetChanged()
+                        ADAPTER.notifyDataSetChanged()
 
                         searchEditText?.isFocusable = false
                         clearSearchEditTextButton?.isEnabled = false
@@ -153,7 +152,7 @@ class SearchActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                     trackList.clear()
-                    adapter.notifyDataSetChanged()
+                    ADAPTER.notifyDataSetChanged()
 
                     searchEditText?.isFocusable = false
                     clearSearchEditTextButton?.isEnabled = false
