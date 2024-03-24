@@ -20,44 +20,22 @@
         android:layout_toEndOf="@+id/ivBackToMainScreen"
         android:text="@string/settings" />
 
-    <FrameLayout
-        android:id="@+id/flNightThemeSwitcher"
+    <Switch
+        android:id="@+id/sNightTheme"
+        style="@style/SettingsTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvSettingsHeader"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="61dp"
-        android:layout_marginStart="@dimen/padding_dimen"
-        android:layout_marginEnd="@dimen/elem_padding">
-
-        <TextView
-            style="@style/SettingsTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/zero_dimen"
-            android:layout_marginTop="@dimen/zero_dimen"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:text="@string/black_theme" />
-
-        <Switch
-            android:id="@+id/sNightTheme"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:alpha="0.6"
-            android:gravity="center"
-            android:thumb="@drawable/settings_switch_thumb_selector"
-            app:track="@drawable/settings_switch_track_selector"
-            tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
-
-    </FrameLayout>
+        android:layout_below="@id/tvSettingsHeader"
+        android:layout_gravity="start"
+        android:text="@string/black_theme"
+        android:thumb="@drawable/settings_switch_thumb_selector"
+        app:track="@drawable/settings_switch_track_selector"
+        tools:ignore="UseSwitchCompatOrMaterialXml,TouchTargetSizeCheck" />
 
     <TextView
         android:id="@+id/tvShareApp"
         style="@style/SettingsTextView"
-        android:layout_below="@id/flNightThemeSwitcher"
+        android:layout_below="@id/sNightTheme"
         app:drawableEndCompat="@drawable/share"
         android:text="@string/share_app" />
 
