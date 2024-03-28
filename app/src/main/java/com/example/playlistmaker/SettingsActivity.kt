@@ -1,7 +1,6 @@
 package com.example.playlistmaker
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
@@ -19,9 +18,9 @@ class SettingsActivity : AppCompatActivity() {
         val writeToSupportButton = findViewById<TextView>(R.id.tvSupport)
         val userAgreementButton = findViewById<TextView>(R.id.tvUserAgreement)
         val themeSwitcher = findViewById<Switch>(R.id.sNightTheme)
+        val darkThemeSharPref = getSharedPreferences("night_theme_on_off", MODE_PRIVATE)
 
-        themeSwitcher.isChecked = resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        themeSwitcher.isChecked = darkThemeSharPref.getString("is_dark_theme", null).toBoolean()
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             (applicationContext as App).switchTheme(checked)
