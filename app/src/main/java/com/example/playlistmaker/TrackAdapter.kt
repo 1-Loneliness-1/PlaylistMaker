@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +15,11 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class TrackAdapter(
-    private val tracks: List<Track>
+    private val tracks: List<Track>,
+    sharPref: SharedPreferences,
+    private val searchHistoryInstance: SearchHistory
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         TrackViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.search_list_item, parent, false)
@@ -25,6 +29,9 @@ class TrackAdapter(
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
+        holder.itemView.setOnClickListener {
+            searchHistoryInstance.saveNewTrack(tracks[position])
+        }
     }
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
