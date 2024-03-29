@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -14,7 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.model.Track
 import com.example.playlistmaker.model.TrackResponse
@@ -44,8 +42,10 @@ class SearchActivity : AppCompatActivity() {
     private var searchHistoryRecycler: RecyclerView? = null
     private var clearHistoryButton: Button? = null
     private var youLookedForText: TextView? = null
-    private var sharPref: SharedPreferences? = null
-    private var listener: OnSharedPreferenceChangeListener? = null
+    private lateinit var sharPref: SharedPreferences
+    private lateinit var listener: OnSharedPreferenceChangeListener
+    private lateinit var adapter: TrackAdapter
+    private lateinit var searchHistoryAdapter: TrackAdapter
 
 
     companion object {
@@ -54,8 +54,6 @@ class SearchActivity : AppCompatActivity() {
         private val trackList = ArrayList<Track>()
         private val searchHistoryList = ArrayList<Track>()
         private const val ITUNES_BASE_URL = "https://itunes.apple.com"
-        private var ADAPTER: TrackAdapter? = null
-        private var SEARCH_HISTORY_ADAPTER: TrackAdapter? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,20 +74,19 @@ class SearchActivity : AppCompatActivity() {
         youLookedForText = findViewById(R.id.tvYouLookedFor)
 
         sharPref = getSharedPreferences(NAME_FOR_FILE_WITH_SEARCH_HISTORY, MODE_PRIVATE)
-        val searchHistory = SearchHistory(sharPref!!)
+        val searchHistory = SearchHistory(sharPref)
 
-        ADAPTER = TrackAdapter(trackList, sharPref!!, searchHistory)
-        searchTracksRecycler?.adapter = ADAPTER
+        adapter = TrackAdapter(trackList) {
+            searchHistory.saveNewTrack(it)
+        }
+        searchTracksRecycler?.adapter = adapter
 
-        //Setting layout manager and adapter for search history list
-        searchHistoryRecycler?.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.VERTICAL,
-            false
-        )
+        //Setting adapter for search history list
         searchHistoryList.addAll(searchHistory.tracksInSearchHistory)
-        SEARCH_HISTORY_ADAPTER = TrackAdapter(searchHistoryList, sharPref!!, searchHistory)
-        searchHistoryRecycler?.adapter = SEARCH_HISTORY_ADAPTER
+        searchHistoryAdapter = TrackAdapter(searchHistoryList) {
+            //Nothing to do on click by search history item
+        }
+        searchHistoryRecycler?.adapter = searchHistoryAdapter
 
         backToPreviousScreenButton.setOnClickListener { finish() }
 
@@ -109,43 +106,28 @@ class SearchActivity : AppCompatActivity() {
             errorNoInternetText?.isVisible = false
             refreshButton?.isVisible = false
             trackList.clear()
-            ADAPTER?.notifyDataSetChanged()
+            adapter.notifyDataSetChanged()
         }
 
-        val textWatcherForSearchEditText = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                //Nothing to do for now
-            }
+        searchEditText?.doAfterTextChanged { s ->
+            clearSearchEditTextButton?.isVisible = s?.isNotEmpty() == true
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                //Nothing to do for now
-            }
+            searchHistoryRecycler?.isVisible = s?.isEmpty() == true &&
+                    searchHistoryList.isNotEmpty()
+            youLookedForText?.isVisible = s?.isEmpty() == true &&
+                    searchHistoryList.isNotEmpty()
+            clearHistoryButton?.isVisible = s?.isEmpty() == true &&
+                    searchHistoryList.isNotEmpty()
+            searchTracksRecycler?.isVisible = s?.isNotEmpty() == true
 
-            override fun afterTextChanged(s: Editable?) {
-                clearSearchEditTextButton?.isVisible = s?.isNotEmpty() == true
-
-                searchHistoryRecycler?.isVisible = s?.isEmpty() == true &&
-                        searchHistoryList.isNotEmpty()
-                youLookedForText?.isVisible = s?.isEmpty() == true &&
-                        searchHistoryList.isNotEmpty()
-                clearHistoryButton?.isVisible = s?.isEmpty() == true &&
-                        searchHistoryList.isNotEmpty()
-                searchTracksRecycler?.isVisible = s?.isNotEmpty() == true
-
-                //Saving current text in edit text in variable for putting in Instance State
-                currentTextInEditText = s.toString()
-            }
-
+            //Saving current text in edit text in variable for putting in Instance State
+            currentTextInEditText = s.toString()
         }
-        searchEditText?.addTextChangedListener(textWatcherForSearchEditText)
         searchEditText?.setOnFocusChangeListener { _, hasFocus ->
             val conditionOfSearchEditText = hasFocus &&
                     searchEditText?.text?.isEmpty() == true &&
                     searchHistoryList.isNotEmpty()
-            searchHistoryRecycler?.isVisible = conditionOfSearchEditText
-            youLookedForText?.isVisible = conditionOfSearchEditText
-            clearHistoryButton?.isVisible = conditionOfSearchEditText
-            searchTracksRecycler?.isVisible = !conditionOfSearchEditText
+            changeVisibilityOfSearchHistoryElements(conditionOfSearchEditText)
         }
         searchEditText?.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -159,18 +141,15 @@ class SearchActivity : AppCompatActivity() {
         clearHistoryButton?.setOnClickListener {
             searchHistory.removeAllTracks()
             searchHistoryList.clear()
-            SEARCH_HISTORY_ADAPTER?.notifyDataSetChanged()
-            searchHistoryRecycler?.isVisible = false
-            youLookedForText?.isVisible = false
-            clearHistoryButton?.isVisible = false
-            searchTracksRecycler?.isVisible = true
+            searchHistoryAdapter.notifyDataSetChanged()
+            changeVisibilityOfSearchHistoryElements(false)
         }
 
         //Implementation of change listener for instance of shared preferences
         listener = OnSharedPreferenceChangeListener { _, _ ->
             searchHistoryList.clear()
             searchHistoryList.addAll(searchHistory.tracksInSearchHistory)
-            SEARCH_HISTORY_ADAPTER?.notifyDataSetChanged()
+            searchHistoryAdapter.notifyDataSetChanged()
         }
 
     }
@@ -178,13 +157,13 @@ class SearchActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        sharPref?.registerOnSharedPreferenceChangeListener(listener)
+        sharPref.registerOnSharedPreferenceChangeListener(listener)
     }
 
     override fun onPause() {
         super.onPause()
 
-        sharPref?.unregisterOnSharedPreferenceChangeListener(listener)
+        sharPref.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -212,7 +191,8 @@ class SearchActivity : AppCompatActivity() {
                     if (response.code() == 200) {
                         trackList.clear()
                         trackList.addAll(response.body()?.results!!)
-                        ADAPTER?.notifyDataSetChanged()
+                        adapter.notifyDataSetChanged()
+                        val isResponseNotEmpty = response.body()?.resultCount == 0
 
                         searchEditText?.isFocusableInTouchMode = true
                         clearSearchEditTextButton?.isEnabled = true
@@ -229,7 +209,7 @@ class SearchActivity : AppCompatActivity() {
                         clearHistoryButton?.isVisible = false
                     } else {
                         trackList.clear()
-                        ADAPTER?.notifyDataSetChanged()
+                        adapter.notifyDataSetChanged()
 
                         searchEditText?.isFocusable = false
                         clearSearchEditTextButton?.isEnabled = false
@@ -249,7 +229,7 @@ class SearchActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                     trackList.clear()
-                    ADAPTER?.notifyDataSetChanged()
+                    adapter.notifyDataSetChanged()
 
                     searchEditText?.isFocusable = false
                     clearSearchEditTextButton?.isEnabled = false
@@ -267,6 +247,14 @@ class SearchActivity : AppCompatActivity() {
                 }
 
             })
+    }
+
+    //Implementation of fun for changing visibility of elements on sending request
+    private fun changeVisibilityOfSearchHistoryElements(isSearchNotEmpty: Boolean) {
+        searchHistoryRecycler?.isVisible = isSearchNotEmpty
+        youLookedForText?.isVisible = isSearchNotEmpty
+        clearHistoryButton?.isVisible = isSearchNotEmpty
+        searchTracksRecycler?.isVisible = !isSearchNotEmpty
     }
 
 }

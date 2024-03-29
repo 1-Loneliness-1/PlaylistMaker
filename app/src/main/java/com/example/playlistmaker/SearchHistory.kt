@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.example.playlistmaker.model.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -11,6 +12,7 @@ class SearchHistory(private val sharPref: SharedPreferences) {
 
     companion object {
         const val KEY_FOR_ARRAY_WITH_SEARCH_HISTORY = "elems_in_search_history"
+        const val MAX_COUNT_OF_TRACKS_IN_SEARCH_HISTORY = 10
     }
 
     init {
@@ -22,14 +24,14 @@ class SearchHistory(private val sharPref: SharedPreferences) {
 
         tracksInSearchHistory.removeIf { it.trackId == track.trackId }
 
-        if (tracksInSearchHistory.size == 10) {
+        if (tracksInSearchHistory.size == MAX_COUNT_OF_TRACKS_IN_SEARCH_HISTORY) {
             tracksInSearchHistory.removeLast()
         }
 
         tracksInSearchHistory.add(0, track)
-        sharPref.edit()
-            .putString(KEY_FOR_ARRAY_WITH_SEARCH_HISTORY, Gson().toJson(tracksInSearchHistory))
-            .apply()
+        sharPref.edit {
+            putString(KEY_FOR_ARRAY_WITH_SEARCH_HISTORY, Gson().toJson(tracksInSearchHistory))
+        }
     }
 
     private fun getTracksFromSharPref() {
@@ -41,9 +43,7 @@ class SearchHistory(private val sharPref: SharedPreferences) {
 
     fun removeAllTracks() {
         tracksInSearchHistory.clear()
-        sharPref.edit()
-            .clear()
-            .apply()
+        sharPref.edit { clear() }
     }
 
 }

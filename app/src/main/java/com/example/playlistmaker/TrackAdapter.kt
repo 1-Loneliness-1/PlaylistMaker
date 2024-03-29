@@ -1,6 +1,5 @@
 package com.example.playlistmaker
 
-import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,29 +15,37 @@ import java.util.Locale
 
 class TrackAdapter(
     private val tracks: List<Track>,
-    sharPref: SharedPreferences,
-    private val searchHistoryInstance: SearchHistory
+    private val onItemClicked: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        TrackViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
+        val viewHolder =
             LayoutInflater.from(parent.context).inflate(R.layout.search_list_item, parent, false)
-        )
+        return TrackViewHolder(viewHolder) {
+            onItemClicked(tracks[it])
+        }
+    }
 
     override fun getItemCount() = tracks.size
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
-        holder.itemView.setOnClickListener {
-            searchHistoryInstance.saveNewTrack(tracks[position])
-        }
     }
 
-    class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class TrackViewHolder(
+        itemView: View,
+        onItemClicked: (Int) -> Unit
+    ) : RecyclerView.ViewHolder(itemView) {
         private val songCover = itemView.findViewById<ImageView>(R.id.ivTrackCover)
         private val trackName = itemView.findViewById<TextView>(R.id.tvTrackName)
         private val artistName = itemView.findViewById<TextView>(R.id.tvArtistName)
         private val trackTime = itemView.findViewById<TextView>(R.id.tvTrackTime)
+
+        init {
+            itemView.setOnClickListener {
+                onItemClicked(adapterPosition)
+            }
+        }
 
         fun bind(model: Track) {
             Glide.with(itemView)

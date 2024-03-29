@@ -18,9 +18,11 @@ class SettingsActivity : AppCompatActivity() {
         val writeToSupportButton = findViewById<TextView>(R.id.tvSupport)
         val userAgreementButton = findViewById<TextView>(R.id.tvUserAgreement)
         val themeSwitcher = findViewById<Switch>(R.id.sNightTheme)
-        val darkThemeSharPref = getSharedPreferences("night_theme_on_off", MODE_PRIVATE)
+        val darkThemeSharPref =
+            getSharedPreferences(App.NAME_OF_FILE_WITH_DARK_MODE_CONDITION, MODE_PRIVATE)
 
-        themeSwitcher.isChecked = darkThemeSharPref.getString("is_dark_theme", null).toBoolean()
+        themeSwitcher.isChecked =
+            darkThemeSharPref.getString(App.KEY_OF_DARK_MODE, null).toBoolean()
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             (applicationContext as App).switchTheme(checked)

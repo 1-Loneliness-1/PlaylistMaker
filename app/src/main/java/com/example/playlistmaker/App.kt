@@ -4,20 +4,25 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 
 class App : Application() {
 
-    private var isDarkModeEnabled: Boolean? = null
     private var sharPref: SharedPreferences? = null
+
+    companion object {
+        const val NAME_OF_FILE_WITH_DARK_MODE_CONDITION = "night_theme_on_off"
+        const val KEY_OF_DARK_MODE = "is_dark_theme"
+    }
 
     override fun onCreate() {
         super.onCreate()
-        isDarkModeEnabled = this.resources.configuration.uiMode and
+        val isDarkModeEnabled = this.resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-        sharPref = getSharedPreferences("night_theme_on_off", MODE_PRIVATE)
-        val sharPrefRes = sharPref?.getString("is_dark_theme", null)
+        sharPref = getSharedPreferences(NAME_OF_FILE_WITH_DARK_MODE_CONDITION, MODE_PRIVATE)
+        val sharPrefRes = sharPref?.getString(KEY_OF_DARK_MODE, null)
         if (sharPrefRes == null) {
-            switchTheme(isDarkModeEnabled!!)
+            switchTheme(isDarkModeEnabled)
         } else {
             switchTheme(sharPrefRes.toBoolean())
         }
@@ -31,8 +36,8 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
-        sharPref?.edit()
-            ?.putString("is_dark_theme", isDarkThemeEnabled.toString())
-            ?.apply()
+        sharPref?.edit {
+            putString("is_dark_theme", isDarkThemeEnabled.toString())
+        }
     }
 }
