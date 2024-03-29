@@ -40,6 +40,8 @@
             android:drawableStart="@drawable/search"
             android:hint="@string/search"
             android:inputType="textAutoCorrect"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:textColor="@color/yp_black"
             android:maxLines="1"
             android:imeOptions="actionDone"
@@ -67,7 +69,8 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="@dimen/icon_size"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/ivNothingFoundPlaceholder"
@@ -132,6 +135,44 @@
         android:layout_alignParentStart="true"
         android:layout_below="@id/tvErrorNoInternet"
         android:text="@string/refresh"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvYouLookedFor"
+        style="@style/ErrorTextForPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/flSearch"
+        android:layout_marginTop="40dp"
+        android:layout_marginHorizontal="@dimen/padding_dimen"
+        android:text="@string/you_looked_for"
+        android:textFontWeight="500"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSearchHistory"
+        android:layout_width="match_parent"
+        android:layout_height="165dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@id/tvYouLookedFor"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/bClearSearchHistory"
+        style="@style/RefreshButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/rvSearchHistory"
+        android:layout_marginTop="@dimen/icon_size"
+        android:layout_marginHorizontal="90dp"
+        android:text="@string/clear_search_history"
         android:visibility="gone" />
 
 </RelativeLayout>
