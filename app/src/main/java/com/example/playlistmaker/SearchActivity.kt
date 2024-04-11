@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
@@ -16,6 +17,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.model.Track
 import com.example.playlistmaker.model.TrackResponse
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class SearchActivity : AppCompatActivity() {
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(ITUNES_BASE_URL)
+        .baseUrl(App.ITUNES_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     private val itunesService = retrofit.create(ItunesApiService::class.java)
@@ -51,9 +53,9 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         const val TEXT_IN_SEARCH_EDIT_TEXT = "TEXT_IN_SEARCH_EDIT_TEXT"
         const val NAME_FOR_FILE_WITH_SEARCH_HISTORY = "search_history"
+        private const val KEY_FOR_INTENT_DATA = "Selected track"
         private val trackList = ArrayList<Track>()
         private val searchHistoryList = ArrayList<Track>()
-        private const val ITUNES_BASE_URL = "https://itunes.apple.com"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,13 +80,23 @@ class SearchActivity : AppCompatActivity() {
 
         adapter = TrackAdapter(trackList) {
             searchHistory.saveNewTrack(it)
+
+            //Implementation of putting information for Player Activity by putExtra fun in Intent
+            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+            playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
+            startActivity(playerIntent)
         }
         searchTracksRecycler?.adapter = adapter
 
         //Setting adapter for search history list
         searchHistoryList.addAll(searchHistory.tracksInSearchHistory)
         searchHistoryAdapter = TrackAdapter(searchHistoryList) {
-            //Nothing to do on click by search history item
+            searchHistory.saveNewTrack(it)
+
+            //Implementation of putting data from item in list to Intent for next player activity
+            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+            playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
+            startActivity(playerIntent)
         }
         searchHistoryRecycler?.adapter = searchHistoryAdapter
 
