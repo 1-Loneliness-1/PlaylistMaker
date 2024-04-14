@@ -45,6 +45,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.squareup.retrofit2:retrofit:2.10.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.activity:activity:1.8.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
