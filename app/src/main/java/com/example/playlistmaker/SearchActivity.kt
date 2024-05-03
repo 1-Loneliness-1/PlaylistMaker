@@ -5,11 +5,13 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
-import android.view.inputmethod.EditorInfo
+import android.os.Handler
+import android.os.Looper
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -44,10 +46,14 @@ class SearchActivity : AppCompatActivity() {
     private var searchHistoryRecycler: RecyclerView? = null
     private var clearHistoryButton: Button? = null
     private var youLookedForText: TextView? = null
+    private var progressBarTrackListLoading: ProgressBar? = null
     private lateinit var sharPref: SharedPreferences
     private lateinit var listener: OnSharedPreferenceChangeListener
     private lateinit var adapter: TrackAdapter
     private lateinit var searchHistoryAdapter: TrackAdapter
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { sendRequest() }
+    private val tapEnableRunnable = Runnable { searchTracksRecycler?.isEnabled = true }
 
 
     companion object {
@@ -56,6 +62,8 @@ class SearchActivity : AppCompatActivity() {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
         private val trackList = ArrayList<Track>()
         private val searchHistoryList = ArrayList<Track>()
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val TAP_DEBOUNCE_DELAY = 1000L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,11 +82,13 @@ class SearchActivity : AppCompatActivity() {
         refreshButton = findViewById(R.id.bRefreshRequest)
         clearHistoryButton = findViewById(R.id.bClearSearchHistory)
         youLookedForText = findViewById(R.id.tvYouLookedFor)
+        progressBarTrackListLoading = findViewById(R.id.pbListOfTracksLoading)
 
         sharPref = getSharedPreferences(NAME_FOR_FILE_WITH_SEARCH_HISTORY, MODE_PRIVATE)
         val searchHistory = SearchHistory(sharPref)
 
         adapter = TrackAdapter(trackList) {
+            tapDebounce()
             searchHistory.saveNewTrack(it)
 
             //Implementation of putting information for Player Activity by putExtra fun in Intent
@@ -91,6 +101,7 @@ class SearchActivity : AppCompatActivity() {
         //Setting adapter for search history list
         searchHistoryList.addAll(searchHistory.tracksInSearchHistory)
         searchHistoryAdapter = TrackAdapter(searchHistoryList) {
+            tapDebounce()
             searchHistory.saveNewTrack(it)
 
             //Implementation of putting data from item in list to Intent for next player activity
@@ -134,19 +145,14 @@ class SearchActivity : AppCompatActivity() {
 
             //Saving current text in edit text in variable for putting in Instance State
             currentTextInEditText = s.toString()
+
+            searchDebounce()
         }
         searchEditText?.setOnFocusChangeListener { _, hasFocus ->
             val conditionOfSearchEditText = hasFocus &&
                     searchEditText?.text?.isEmpty() == true &&
                     searchHistoryList.isNotEmpty()
             changeVisibilityOfSearchHistoryElements(conditionOfSearchEditText)
-        }
-        searchEditText?.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                sendRequest()
-                true
-            }
-            false
         }
 
         //Implementation of on click listener for clear search history button
@@ -193,7 +199,17 @@ class SearchActivity : AppCompatActivity() {
 
     //Fun for making request
     private fun sendRequest() {
-
+        progressBarTrackListLoading?.isVisible = true
+        searchTracksRecycler?.isVisible = false
+        noInternetPlaceholder?.isVisible = false
+        noResultsPlaceholder?.isVisible = false
+        errorNothingFoundText?.isVisible = false
+        errorNoInternetText?.isVisible = false
+        refreshButton?.isVisible = false
+        searchTracksRecycler?.isVisible = false
+        youLookedForText?.isVisible = false
+        searchHistoryRecycler?.isVisible = false
+        clearHistoryButton?.isVisible = false
         itunesService.search(searchEditText?.text.toString())
             .enqueue(object : Callback<TrackResponse> {
                 override fun onResponse(
@@ -204,7 +220,8 @@ class SearchActivity : AppCompatActivity() {
                         trackList.clear()
                         trackList.addAll(response.body()?.results!!)
                         adapter.notifyDataSetChanged()
-                        val isResponseNotEmpty = response.body()?.resultCount == 0
+
+                        progressBarTrackListLoading?.isVisible = false
 
                         searchEditText?.isFocusableInTouchMode = true
                         clearSearchEditTextButton?.isEnabled = true
@@ -222,6 +239,8 @@ class SearchActivity : AppCompatActivity() {
                     } else {
                         trackList.clear()
                         adapter.notifyDataSetChanged()
+
+                        progressBarTrackListLoading?.isVisible = false
 
                         searchEditText?.isFocusable = false
                         clearSearchEditTextButton?.isEnabled = false
@@ -242,6 +261,8 @@ class SearchActivity : AppCompatActivity() {
                 override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
                     trackList.clear()
                     adapter.notifyDataSetChanged()
+
+                    progressBarTrackListLoading?.isVisible = false
 
                     searchEditText?.isFocusable = false
                     clearSearchEditTextButton?.isEnabled = false
@@ -269,4 +290,14 @@ class SearchActivity : AppCompatActivity() {
         searchTracksRecycler?.isVisible = !isSearchNotEmpty
     }
 
+    private fun searchDebounce() {
+        mainHandler.removeCallbacksAndMessages(searchRunnable)
+        if (searchEditText?.text?.isNotEmpty() == true)
+            mainHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun tapDebounce() {
+        searchTracksRecycler?.isEnabled = false
+        mainHandler.postDelayed(tapEnableRunnable, TAP_DEBOUNCE_DELAY)
+    }
 }
