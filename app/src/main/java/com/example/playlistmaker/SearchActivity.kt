@@ -47,13 +47,14 @@ class SearchActivity : AppCompatActivity() {
     private var clearHistoryButton: Button? = null
     private var youLookedForText: TextView? = null
     private var progressBarTrackListLoading: ProgressBar? = null
+    private var isNotPressed = true
     private lateinit var sharPref: SharedPreferences
     private lateinit var listener: OnSharedPreferenceChangeListener
     private lateinit var adapter: TrackAdapter
     private lateinit var searchHistoryAdapter: TrackAdapter
     private val mainHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { sendRequest() }
-    private val tapEnableRunnable = Runnable { searchTracksRecycler?.isEnabled = true }
+    private val tapEnableRunnable = Runnable { isNotPressed = true }
 
 
     companion object {
@@ -88,26 +89,30 @@ class SearchActivity : AppCompatActivity() {
         val searchHistory = SearchHistory(sharPref)
 
         adapter = TrackAdapter(trackList) {
-            tapDebounce()
-            searchHistory.saveNewTrack(it)
+            if (isNotPressed) {
+                tapDebounce()
+                searchHistory.saveNewTrack(it)
 
-            //Implementation of putting information for Player Activity by putExtra fun in Intent
-            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
-            playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
-            startActivity(playerIntent)
+                //Implementation of putting information for Player Activity by putExtra fun in Intent
+                val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+                playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
+                startActivity(playerIntent)
+            }
         }
         searchTracksRecycler?.adapter = adapter
 
         //Setting adapter for search history list
         searchHistoryList.addAll(searchHistory.tracksInSearchHistory)
         searchHistoryAdapter = TrackAdapter(searchHistoryList) {
-            tapDebounce()
-            searchHistory.saveNewTrack(it)
+            if (isNotPressed) {
+                tapDebounce()
+                searchHistory.saveNewTrack(it)
 
-            //Implementation of putting data from item in list to Intent for next player activity
-            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
-            playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
-            startActivity(playerIntent)
+                //Implementation of putting information for Player Activity by putExtra fun in Intent
+                val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+                playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
+                startActivity(playerIntent)
+            }
         }
         searchHistoryRecycler?.adapter = searchHistoryAdapter
 
@@ -116,8 +121,10 @@ class SearchActivity : AppCompatActivity() {
         refreshButton?.setOnClickListener { sendRequest() }
 
         clearSearchEditTextButton?.setOnClickListener {
+            mainHandler.removeCallbacksAndMessages(searchRunnable)
             searchEditText?.setText("")
             clearSearchEditTextButton?.isVisible = false
+            progressBarTrackListLoading?.isVisible = false
             searchEditText?.clearFocus()
             val inputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
@@ -182,6 +189,11 @@ class SearchActivity : AppCompatActivity() {
         super.onPause()
 
         sharPref.unregisterOnSharedPreferenceChangeListener(listener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainHandler.removeCallbacksAndMessages(searchRunnable)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -297,7 +309,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun tapDebounce() {
-        searchTracksRecycler?.isEnabled = false
+        isNotPressed = false
         mainHandler.postDelayed(tapEnableRunnable, TAP_DEBOUNCE_DELAY)
     }
 }

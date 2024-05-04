@@ -25,6 +25,7 @@ class PlayerActivity : AppCompatActivity() {
     private var playerState = STATE_DEFAULT
     private lateinit var playStopButton: ImageButton
     private lateinit var currentTrackTime: TextView
+    private lateinit var updateTextViewRunnable: Runnable
 
     companion object {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
@@ -56,30 +57,11 @@ class PlayerActivity : AppCompatActivity() {
 
         playStopButton.isEnabled = false
 
-        playStopButton.setOnClickListener {
-            when (playerState) {
-                STATE_PREPARED, STATE_PAUSED -> {
-                    playStopButton.setImageResource(R.drawable.pause_icon)
-                    mediaPlayer.start()
-                    playerState = STATE_PLAYING
-                    mainHandler.post(updateStateOfCurrentTimeTextView())
-                }
-
-                STATE_PLAYING -> {
-                    playStopButton.setImageResource(R.drawable.play_icon)
-                    mediaPlayer.pause()
-                    playerState = STATE_PAUSED
-                    mainHandler.removeCallbacksAndMessages(updateStateOfCurrentTimeTextView())
-                }
-            }
-        }
-
         backToPrevScreenButton.setOnClickListener { finish() }
 
         val json: String? = intent.getStringExtra(KEY_FOR_INTENT_DATA)
+        val currentTrack: Track = Gson().fromJson(json, Track::class.java)
         if (json != null) {
-            val currentTrack: Track = Gson().fromJson(json, Track::class.java)
-            preparePlayer(currentTrack.previewUrl)
             Glide.with(this)
                 .load(currentTrack.artworkUrl100.replace("100x100bb.jpg", "512x512bb.jpg"))
                 .placeholder(R.drawable.song_cover_placeholder)
@@ -102,17 +84,51 @@ class PlayerActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_SHORT).show()
         }
+
+        updateTextViewRunnable = object : Runnable {
+            override fun run() {
+                if (playerState == STATE_PLAYING)
+                    currentTrackTime.text = SimpleDateFormat(
+                        "mm:ss",
+                        Locale.getDefault()
+                    ).format(mediaPlayer.currentPosition)
+                mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
+            }
+        }
+
+        preparePlayer(currentTrack.previewUrl)
+
+        playStopButton.setOnClickListener {
+            when (playerState) {
+                STATE_PREPARED, STATE_PAUSED -> {
+                    playStopButton.setImageResource(R.drawable.pause_icon)
+                    mediaPlayer.start()
+                    playerState = STATE_PLAYING
+                    mainHandler.post(updateTextViewRunnable)
+                }
+
+                STATE_PLAYING -> {
+                    playStopButton.setImageResource(R.drawable.play_icon)
+                    mediaPlayer.pause()
+                    playerState = STATE_PAUSED
+                    mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
+                }
+            }
+        }
+
     }
 
     override fun onPause() {
         super.onPause()
         mediaPlayer.pause()
+        mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
         playerState = STATE_PAUSED
         playStopButton.setImageResource(R.drawable.play_icon)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
         mediaPlayer.release()
     }
 
@@ -125,22 +141,9 @@ class PlayerActivity : AppCompatActivity() {
         }
         mediaPlayer.setOnCompletionListener {
             playerState = STATE_PREPARED
-            mainHandler.removeCallbacksAndMessages(updateStateOfCurrentTimeTextView())
+            mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
             currentTrackTime.text = getString(R.string.start_time)
             playStopButton.setImageResource(R.drawable.play_icon)
-        }
-    }
-
-    private fun updateStateOfCurrentTimeTextView(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                if (playerState == STATE_PLAYING)
-                    currentTrackTime.text = SimpleDateFormat(
-                        "mm:ss",
-                        Locale.getDefault()
-                    ).format(mediaPlayer.currentPosition)
-                mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
-            }
         }
     }
 }
