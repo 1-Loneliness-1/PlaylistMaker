@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.search
 
 import android.content.Context
 import android.content.Intent
@@ -17,8 +17,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.model.Track
-import com.example.playlistmaker.model.TrackResponse
+import com.example.playlistmaker.App
+import com.example.playlistmaker.R
+import com.example.playlistmaker.data.network.ItunesApiService
+import com.example.playlistmaker.domain.entities.Track
+import com.example.playlistmaker.domain.entities.TrackResponse
+import com.example.playlistmaker.presentation.player.PlayerActivity
 import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback

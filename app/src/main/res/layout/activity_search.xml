@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/Theme.DayNightScreen"
-    tools:context=".SearchActivity">
+    tools:context=".presentation.search.SearchActivity">
 
     <ImageView
         android:id="@+id/ivBackToPreviousScreen"

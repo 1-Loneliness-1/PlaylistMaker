@@ -1,6 +1,5 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.player
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,7 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.playlistmaker.model.Track
+import com.example.playlistmaker.R
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.domain.entities.Track
+import com.example.playlistmaker.domain.usecases.PlayerInteractor
 import com.example.playlistmaker.utils.DimenConvertor
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
@@ -20,9 +22,8 @@ import java.util.Locale
 
 class PlayerActivity : AppCompatActivity() {
 
-    private val mediaPlayer = MediaPlayer()
     private val mainHandler = Handler(Looper.getMainLooper())
-    private var playerState = STATE_DEFAULT
+    private lateinit var playerInteractor: PlayerInteractor
     private lateinit var playStopButton: ImageButton
     private lateinit var currentTrackTime: TextView
     private lateinit var updateTextViewRunnable: Runnable
@@ -30,7 +31,6 @@ class PlayerActivity : AppCompatActivity() {
     companion object {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
         private const val CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY = 500L
-        private const val STATE_DEFAULT = 0
         private const val STATE_PREPARED = 1
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
@@ -54,8 +54,6 @@ class PlayerActivity : AppCompatActivity() {
         //Initialize variables of class
         playStopButton = findViewById(R.id.ibPlayStop)
         currentTrackTime = findViewById(R.id.tvCurrentTrackTime)
-
-        playStopButton.isEnabled = false
 
         backToPrevScreenButton.setOnClickListener { finish() }
 
@@ -85,32 +83,37 @@ class PlayerActivity : AppCompatActivity() {
             Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_SHORT).show()
         }
 
+        playerInteractor = Creator.providePlayerInteractor(currentTrack.previewUrl)
+        playerInteractor.prepPlayer()
+
         updateTextViewRunnable = object : Runnable {
             override fun run() {
-                if (playerState == STATE_PLAYING)
-                    currentTrackTime.text = SimpleDateFormat(
-                        "mm:ss",
-                        Locale.getDefault()
-                    ).format(mediaPlayer.currentPosition)
-                mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
+                when (playerInteractor.getCurrentStateOfPlayer()) {
+                    STATE_PLAYING -> {
+                        currentTrackTime.text = playerInteractor.updatePositionOfTrackTime()
+                        mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
+                    }
+
+                    STATE_PREPARED -> {
+                        mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
+                        currentTrackTime.text = getString(R.string.start_time)
+                        playStopButton.setImageResource(R.drawable.play_icon)
+                    }
+                }
             }
         }
 
-        preparePlayer(currentTrack.previewUrl)
-
         playStopButton.setOnClickListener {
-            when (playerState) {
+            when (playerInteractor.getCurrentStateOfPlayer()) {
                 STATE_PREPARED, STATE_PAUSED -> {
                     playStopButton.setImageResource(R.drawable.pause_icon)
-                    mediaPlayer.start()
-                    playerState = STATE_PLAYING
+                    playerInteractor.startPlayer()
                     mainHandler.post(updateTextViewRunnable)
                 }
 
                 STATE_PLAYING -> {
                     playStopButton.setImageResource(R.drawable.play_icon)
-                    mediaPlayer.pause()
-                    playerState = STATE_PAUSED
+                    playerInteractor.pausePlayer()
                     mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
                 }
             }
@@ -120,30 +123,14 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        mediaPlayer.pause()
+        playerInteractor.pausePlayer()
         mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
-        playerState = STATE_PAUSED
         playStopButton.setImageResource(R.drawable.play_icon)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
-        mediaPlayer.release()
-    }
-
-    private fun preparePlayer(songExampleUrl: String) {
-        mediaPlayer.setDataSource(songExampleUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            playStopButton.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
-            mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
-            currentTrackTime.text = getString(R.string.start_time)
-            playStopButton.setImageResource(R.drawable.play_icon)
-        }
+        playerInteractor.releaseResourcesForPlayer()
     }
 }

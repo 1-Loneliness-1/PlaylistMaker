@@ -1,4 +1,4 @@
-package com.example.playlistmaker.model
+package com.example.playlistmaker.domain.entities
 
 data class Track(
     val trackId: Long, //Универсальный номер трека
