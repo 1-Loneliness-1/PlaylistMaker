@@ -9,8 +9,7 @@ import com.example.playlistmaker.domain.player.impl.PlayerInteractor
 import com.example.playlistmaker.domain.player.model.PlayerScreenState
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor,
-    private val trackInfoInteractor
+    private val playerInteractor: PlayerInteractor
 ) : ViewModel() {
     private var loadingLiveData = MutableLiveData(true)
     private var screenStateLiveData = MutableLiveData<PlayerScreenState>(PlayerScreenState.Loading)

@@ -32,9 +32,17 @@ object Creator {
         return TracksInteractorImpl(getTracksRepository())
     }
 
-    private fun getSharPrefRepository(): SharPrefRepository =
-        SharPrefRepositoryImpl()
+    private fun getSharPrefRepository(
+        app: Application,
+        nameOfFile: String,
+        key: String
+    ): SharPrefRepository =
+        SharPrefRepositoryImpl(app, nameOfFile, key)
 
-    fun provideSharPrefInteractor(app: Application): SharPrefInteractor =
-        SharPrefInteractorImpl(app, getSharPrefRepository())
+    fun provideSharPrefInteractor(
+        app: Application,
+        nameOfFile: String,
+        key: String
+    ): SharPrefInteractor =
+        SharPrefInteractorImpl(getSharPrefRepository(app, nameOfFile, key))
 }

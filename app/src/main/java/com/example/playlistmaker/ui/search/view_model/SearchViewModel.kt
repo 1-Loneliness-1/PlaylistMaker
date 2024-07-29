@@ -11,43 +11,48 @@ import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.search.SharPrefInteractor
 import com.example.playlistmaker.domain.search.TracksInteractor
 import com.example.playlistmaker.domain.search.model.SearchScreenState
-import com.example.playlistmaker.domain.search.model.Track
 
 class SearchViewModel(
     application: Application,
     private val tracksInteractor: TracksInteractor,
-    private val sharPrefInteractor: SharPrefInteractor
+    val sharPrefInteractor: SharPrefInteractor
 ) : AndroidViewModel(application) {
 
     private val searchScreenStateLiveData =
-        MutableLiveData<SearchScreenState>(SearchScreenState.Loading)
+        MutableLiveData<SearchScreenState>(SearchScreenState.Waiting)
 
     fun getSearchScreenStateLiveData(): LiveData<SearchScreenState> = searchScreenStateLiveData
 
     companion object {
-        fun getViewModelFactory(app: Application): ViewModelProvider.Factory = viewModelFactory {
+        fun getViewModelFactory(
+            app: Application,
+            nameOfFile: String,
+            key: String
+        ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 SearchViewModel(
                     app,
                     Creator.provideTracksInteractor(),
-                    Creator.provideSharPrefInteractor(app)
+                    Creator.provideSharPrefInteractor(app, nameOfFile, key)
                 )
             }
         }
     }
 
     fun getTracksForList(exp: String) {
-        searchScreenStateLiveData.postValue(
-            SearchScreenState.Content(tracksInteractor.searchTracks(exp))
-        )
+        searchScreenStateLiveData.apply {
+            postValue(SearchScreenState.Loading)
+            postValue(SearchScreenState.Content(tracksInteractor.searchTracks(exp)))
+        }
     }
 
-    fun getValForSharPref(): Any =
-        sharPrefInteractor.getResFromSharPref()
+    fun setWaitingStateForScreen() {
+        searchScreenStateLiveData.postValue(SearchScreenState.Waiting)
+    }
 
-    fun putValInSharPref(trackForSave: Track) =
-        sharPrefInteractor.putResToSharPref(trackForSave)
+    fun registerChangeListener(listener: () -> Unit) =
+        sharPrefInteractor.registerChangeListener(listener)
 
-    fun removeAllValFromSharPref() =
-        sharPrefInteractor.removeAllRes()
+    fun unregisterChangeListener() =
+        sharPrefInteractor.unregisterChangeListener()
 }

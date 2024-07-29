@@ -12,39 +12,40 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
 
     override fun searchTracks(expression: String): List<Track> {
         val resp = networkClient.doRequest(TracksSearchRequest(expression))
-        if (resp.resultCode == 200) {
-            return (resp as TracksSearchResponse).results.map {
-                Track(
-                    it.trackId,
-                    it.trackName,
-                    it.artistName,
-                    SimpleDateFormat("mm:ss", Locale.getDefault()).format(it.trackTimeMillis),
-                    it.collectionName,
-                    it.releaseDate,
-                    it.primaryGenreName,
-                    it.country,
-                    it.artworkUrl100,
-                    it.previewUrl
+        when (resp.resultCode) {
+            200 -> {
+                return (resp as TracksSearchResponse).results.map {
+                    Track(
+                        it.trackId,
+                        it.trackName,
+                        it.artistName,
+                        SimpleDateFormat("mm:ss", Locale.getDefault()).format(it.trackTimeMillis),
+                        it.collectionName,
+                        it.releaseDate,
+                        it.primaryGenreName,
+                        it.country,
+                        it.artworkUrl100,
+                        it.previewUrl
+                    )
+                }
+            }
+
+            else -> {
+                return listOf(
+                    Track(
+                        -1,
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        ""
+                    )
                 )
             }
-        } else if (resp.resultCode == 0) {
-            return listOf(
-                Track(
-                    -1,
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    ""
-                )
-            )
-        } else {
-            return emptyList()
         }
     }
-
 }

@@ -1,10 +1,10 @@
 package com.example.playlistmaker.ui.media.activity
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.example.playlistmaker.databinding.ActivityMediaBinding
 
-class MediaActivity : ComponentActivity() {
+class MediaActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMediaBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -6,7 +6,7 @@ import android.os.Looper
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -20,7 +20,7 @@ import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerActivity : ComponentActivity() {
+class PlayerActivity : AppCompatActivity() {
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private lateinit var playerInteractor: PlayerInteractor

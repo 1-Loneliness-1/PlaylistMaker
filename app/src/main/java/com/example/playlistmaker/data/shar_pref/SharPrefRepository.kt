@@ -7,7 +7,9 @@ interface SharPrefRepository {
     val nameOfFile: String
     val key: String
 
-    fun getResource(): Any
-    fun putResource(res: Any)
+    fun <T> getArrayListFromResource(): ArrayList<T>
+    fun <T> putArrayListInSharPref(res: ArrayList<T>)
     fun removeAllResources()
+    fun registerChangeListener(listener: () -> Unit)
+    fun unregisterChangeListener()
 }
