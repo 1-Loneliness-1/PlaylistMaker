@@ -22,8 +22,7 @@ class RetrofitNetworkClient : NetworkClient {
 
     private val itunesService = retrofit.create(ItunesApiService::class.java)
 
-    override fun doRequest(dto: Any): Response {
-        var listOfTracks = Response()
+    override fun doRequest(dto: Any, consume: (Response) -> Unit) {
         when (dto) {
             is TracksSearchRequest -> {
                 itunesService.search(dto.searchExpression)
@@ -33,22 +32,24 @@ class RetrofitNetworkClient : NetworkClient {
                             response: retrofit2.Response<TracksSearchResponse>
                         ) {
                             if (response.code() == 200) {
-                                listOfTracks =
+                                consume(
                                     response.body()!!.apply { resultCode = response.code() }
+                                )
                             } else {
-                                listOfTracks = Response().apply { resultCode = response.code() }
+                                consume(
+                                    Response().apply { resultCode = response.code() }
+                                )
                             }
                         }
 
                         override fun onFailure(p0: Call<TracksSearchResponse>, p1: Throwable) {
-                            listOfTracks = Response()
+                            consume(Response())
                         }
 
                     })
-                return listOfTracks
             }
             else -> {
-                return Response().apply { resultCode = 400 }
+                consume(Response().apply { resultCode = 400 })
             }
         }
     }

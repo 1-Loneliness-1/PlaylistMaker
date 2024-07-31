@@ -1,6 +1,6 @@
 package com.example.playlistmaker.domain.search.impl
 
-import com.example.playlistmaker.data.shar_pref.SharPrefRepository
+import com.example.playlistmaker.data.search.SharPrefRepository
 import com.example.playlistmaker.domain.search.SharPrefInteractor
 import com.example.playlistmaker.domain.search.model.Track
 

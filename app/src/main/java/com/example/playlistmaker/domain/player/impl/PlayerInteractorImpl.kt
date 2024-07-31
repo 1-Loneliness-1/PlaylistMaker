@@ -10,12 +10,10 @@ class PlayerInteractor(private val mediaPlayerRepository: PlayerRepository) : Pl
 
     override fun stopPlayer() = mediaPlayerRepository.stopPlayer()
 
-    override fun updatePositionOfTrackTime() =
+    override fun getCurrentPosition() =
         mediaPlayerRepository.getCurrentPositionOfTrackTime()
-
-    override fun getCurrentStateOfPlayer() = mediaPlayerRepository.getCurrentStateOfMediaPlayer()
 
     override fun releaseResourcesForPlayer() = mediaPlayerRepository.releaseResourcesForPlayer()
 
-    override fun prepPlayer() = mediaPlayerRepository.preparePlayer()
+    override fun prepPlayer(urlOfMusic: String) = mediaPlayerRepository.preparePlayer(urlOfMusic)
 }

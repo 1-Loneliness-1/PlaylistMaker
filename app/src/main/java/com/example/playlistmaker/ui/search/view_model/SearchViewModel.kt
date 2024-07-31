@@ -11,6 +11,7 @@ import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.search.SharPrefInteractor
 import com.example.playlistmaker.domain.search.TracksInteractor
 import com.example.playlistmaker.domain.search.model.SearchScreenState
+import com.example.playlistmaker.domain.search.model.Track
 
 class SearchViewModel(
     application: Application,
@@ -39,15 +40,17 @@ class SearchViewModel(
         }
     }
 
-    fun getTracksForList(exp: String) {
-        searchScreenStateLiveData.apply {
-            postValue(SearchScreenState.Loading)
-            postValue(SearchScreenState.Content(tracksInteractor.searchTracks(exp)))
-        }
+    fun getTracksForList(exp: String, consume: (List<Track>) -> Unit) {
+        searchScreenStateLiveData.postValue(SearchScreenState.Loading)
+        tracksInteractor.searchTracks(exp, consume)
     }
 
     fun setWaitingStateForScreen() {
         searchScreenStateLiveData.postValue(SearchScreenState.Waiting)
+    }
+
+    fun setContentStateOfScreen(listOfTracks: List<Track>) {
+        searchScreenStateLiveData.postValue(SearchScreenState.Content(listOfTracks))
     }
 
     fun registerChangeListener(listener: () -> Unit) =

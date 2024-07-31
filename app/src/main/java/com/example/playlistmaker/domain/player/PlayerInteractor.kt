@@ -4,8 +4,7 @@ interface PlayerInteractor {
     fun startPlayer()
     fun pausePlayer()
     fun stopPlayer()
-    fun updatePositionOfTrackTime(): String
-    fun getCurrentStateOfPlayer(): Int
+    fun getCurrentPosition(): String
     fun releaseResourcesForPlayer()
-    fun prepPlayer()
+    fun prepPlayer(urlOfMusic: String)
 }

@@ -3,28 +3,39 @@ package com.example.playlistmaker.ui.settings.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.Switch
-import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.playlistmaker.App
 import com.example.playlistmaker.R
+import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
 
 class SettingsActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivitySettingsBinding
+
+    private val viewModel by viewModels<SettingsViewModel> {
+        SettingsViewModel.getViewModelFactory(
+            application
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val backToMainScreenButton = findViewById<ImageView>(R.id.ivBackToMainScreen)
-        val shareAppButton = findViewById<TextView>(R.id.tvShareApp)
-        val writeToSupportButton = findViewById<TextView>(R.id.tvSupport)
-        val userAgreementButton = findViewById<TextView>(R.id.tvUserAgreement)
-        val themeSwitcher = findViewById<Switch>(R.id.sNightTheme)
-        val darkThemeSharPref =
-            getSharedPreferences(App.NAME_OF_FILE_WITH_DARK_MODE_CONDITION, MODE_PRIVATE)
+        val backToMainScreenButton = binding.ivBackToMainScreen
+        val shareAppButton = binding.tvShareApp
+        val writeToSupportButton = binding.tvSupport
+        val userAgreementButton = binding.tvUserAgreement
+        val themeSwitcher = binding.sNightTheme
 
         themeSwitcher.isChecked =
-            darkThemeSharPref.getString(App.KEY_OF_DARK_MODE, null).toBoolean()
+            if (viewModel.getDarkThemeStateFromSharPref() == null)
+                (applicationContext as App).getDarkModeState()
+            else
+                viewModel.getDarkThemeStateFromSharPref()!!
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             (applicationContext as App).switchTheme(checked)

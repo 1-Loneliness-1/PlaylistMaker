@@ -9,8 +9,6 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.SearchListItemBinding
 import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.utils.DimenConvertor
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class TrackAdapter(
     private val tracks: List<Track>,
@@ -36,22 +34,21 @@ class TrackAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            itemView.setOnClickListener {
+            binding.root.setOnClickListener {
                 onItemClicked(adapterPosition)
             }
         }
 
         fun bind(model: Track) {
-            Glide.with(itemView)
+            Glide.with(binding.root)
                 .load(model.artworkUrl100)
                 .placeholder(R.drawable.song_cover_placeholder)
                 .centerCrop()
-                .transform(RoundedCorners(DimenConvertor.dpToPx(2f, itemView.context)))
+                .transform(RoundedCorners(DimenConvertor.dpToPx(2f, binding.root.context)))
                 .into(binding.ivTrackCover)
             binding.tvTrackName.text = model.trackName
             binding.tvArtistName.text = model.artistName
-            binding.tvTrackTime.text =
-                SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTimeMillis)
+            binding.tvTrackTime.text = model.trackTimeMillis
         }
     }
 

@@ -1,10 +1,11 @@
-package com.example.playlistmaker.data.shar_pref.impl
+package com.example.playlistmaker.data.search.impl
 
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
-import com.example.playlistmaker.data.shar_pref.SharPrefRepository
+import com.example.playlistmaker.data.search.SharPrefRepository
+import com.example.playlistmaker.domain.search.model.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -20,13 +21,13 @@ class SharPrefRepositoryImpl(
 
         }
 
-    override fun <T> getArrayListFromResource(): ArrayList<T> {
+    override fun getArrayListFromResource(): ArrayList<Track> {
         val json: String? = sharPref.getString(key, null)
-        val listType = object : TypeToken<ArrayList<T>>() {}.type
+        val listType = object : TypeToken<ArrayList<Track>>() {}.type
         return if (json != null) Gson().fromJson(json, listType) else ArrayList()
     }
 
-    override fun <T> putArrayListInSharPref(res: ArrayList<T>) {
+    override fun putArrayListInSharPref(res: ArrayList<Track>) {
         sharPref.edit {
             putString(key, Gson().toJson(res))
         }

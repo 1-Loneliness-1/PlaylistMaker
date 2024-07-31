@@ -51,10 +51,17 @@ class SearchActivity : AppCompatActivity() {
             KEY_FOR_ARRAY_WITH_SEARCH_HISTORY
         )
     }
-    private val mainHandler = Handler(Looper.getMainLooper())
-    private val searchRunnable = Runnable { viewModel.getTracksForList(currentTextInEditText) }
-    private val tapEnableRunnable = Runnable { isNotPressed = true }
 
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable {
+        viewModel.getTracksForList(
+            currentTextInEditText,
+            consume = { listOfTracks ->
+                changeStateOfScreenToContent(listOfTracks)
+            }
+        )
+    }
+    private val tapEnableRunnable = Runnable { isNotPressed = true }
 
     companion object {
         const val TEXT_IN_SEARCH_EDIT_TEXT = "TEXT_IN_SEARCH_EDIT_TEXT"
@@ -83,7 +90,6 @@ class SearchActivity : AppCompatActivity() {
                     //Showing progressbar? or something different
                     changeVisibilityOfElements(false)
                 }
-
                 is SearchScreenState.Content -> {
                     trackList.clear()
                     //Showing necessary elements and hiding progress bar
@@ -147,23 +153,25 @@ class SearchActivity : AppCompatActivity() {
 
         binding.ivBackToPreviousScreen.setOnClickListener { finish() }
 
-        refreshButton.setOnClickListener { viewModel.getTracksForList(currentTextInEditText) }
+        refreshButton.setOnClickListener {
+            viewModel.getTracksForList(
+                currentTextInEditText,
+                consume = { listOfTracks ->
+                    changeStateOfScreenToContent(listOfTracks)
+                }
+            )
+        }
 
         clearSearchEditTextButton.setOnClickListener {
             mainHandler.removeCallbacksAndMessages(searchRunnable)
             searchEditText.setText("")
             clearSearchEditTextButton.isVisible = false
-            progressBarTrackListLoading.isVisible = false
             searchEditText.clearFocus()
             val inputMethodManager =
                 getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
 
-            noInternetPlaceholder.isVisible = false
-            noResultsPlaceholder.isVisible = false
-            errorNothingFoundText.isVisible = false
-            errorNoInternetText.isVisible = false
-            refreshButton.isVisible = false
+            viewModel.setWaitingStateForScreen()
 
             trackList.clear()
             adapter.notifyDataSetChanged()
@@ -172,21 +180,15 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.doAfterTextChanged { s ->
             clearSearchEditTextButton.isVisible = s?.isNotEmpty() == true
 
-            if (s?.isEmpty() == true) {
-                viewModel.setWaitingStateForScreen()
-            }
-
-            changeVisibilityOfElements(false)
-            changeVisibilityOfSearchHistoryElements(
-                s?.isEmpty() == true &&
-                        searchHistoryList.isNotEmpty()
-            )
-            searchTracksRecycler.isVisible = s?.isNotEmpty() == true
-
             //Saving current text in edit text in variable for putting in Instance State
             currentTextInEditText = s.toString()
 
-            searchDebounce()
+            if (s?.isNotEmpty() == true) {
+                searchDebounce()
+            } else {
+                mainHandler.removeCallbacksAndMessages(searchRunnable)
+                viewModel.setWaitingStateForScreen()
+            }
         }
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             val conditionOfSearchEditText = hasFocus &&
@@ -273,6 +275,8 @@ class SearchActivity : AppCompatActivity() {
                 binding.ivNoInternetPlaceholder.isVisible = false
                 binding.ivNothingFoundPlaceholder.isVisible = false
                 binding.bRefreshRequest.isVisible = false
+
+                changeVisibilityOfSearchHistoryElements(false)
             }
             "Nothing found" -> {
                 binding.pbListOfTracksLoading.isVisible = false
@@ -283,10 +287,12 @@ class SearchActivity : AppCompatActivity() {
                 clearSearchEditTextButton.isClickable = true
 
                 binding.tvErrorNoInternet.isVisible = false
-                binding.tvErrorNothingFound.isVisible = true
                 binding.ivNoInternetPlaceholder.isVisible = false
-                binding.ivNothingFoundPlaceholder.isVisible = true
                 binding.bRefreshRequest.isVisible = false
+
+                if (currentTextInEditText.isEmpty()) {
+                    viewModel.setWaitingStateForScreen()
+                }
 
                 changeVisibilityOfSearchHistoryElements(false)
             }
@@ -326,5 +332,9 @@ class SearchActivity : AppCompatActivity() {
     private fun tapDebounce() {
         isNotPressed = false
         mainHandler.postDelayed(tapEnableRunnable, TAP_DEBOUNCE_DELAY)
+    }
+
+    private fun changeStateOfScreenToContent(listOfTracks: List<Track>) {
+        viewModel.setContentStateOfScreen(listOfTracks)
     }
 }

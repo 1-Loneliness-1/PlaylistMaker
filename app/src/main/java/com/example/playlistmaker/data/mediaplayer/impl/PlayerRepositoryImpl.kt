@@ -13,11 +13,9 @@ class PlayerRepositoryImpl(private val mediaPlayer: Playable) : PlayerRepository
     override fun getCurrentPositionOfTrackTime() =
         mediaPlayer.getCurrentPositionOfPlayer()
 
-    override fun getCurrentStateOfMediaPlayer() = mediaPlayer.getCurrentStateOfPlayer()
-
     override fun releaseResourcesForPlayer() =
         mediaPlayer.releaseResourcesForPlayer()
 
-    override fun preparePlayer() = mediaPlayer.preparePlayer()
+    override fun preparePlayer(urlOfMusic: String) = mediaPlayer.preparePlayer(urlOfMusic)
 
 }
