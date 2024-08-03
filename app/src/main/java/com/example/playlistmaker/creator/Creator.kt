@@ -1,6 +1,6 @@
 package com.example.playlistmaker.creator
 
-import android.app.Application
+import android.content.SharedPreferences
 import com.example.playlistmaker.data.mediaplayer.PlayerForMusic
 import com.example.playlistmaker.data.mediaplayer.PlayerRepository
 import com.example.playlistmaker.data.mediaplayer.impl.PlayerRepositoryImpl
@@ -23,40 +23,24 @@ object Creator {
     private fun getPlayerRepository(consume: (Int) -> Unit): PlayerRepository =
         PlayerRepositoryImpl(PlayerForMusic(consume))
 
-
     fun providePlayerInteractor(consume: (Int) -> Unit): PlayerInteractor =
         PlayerInteractor(getPlayerRepository(consume))
-
 
     private fun getTracksRepository(): TracksRepository =
         TracksRepositoryImpl(RetrofitNetworkClient())
 
-
     fun provideTracksInteractor(): TracksInteractor =
         TracksInteractorImpl(getTracksRepository())
 
+    private fun getSharPrefRepository(sharPref: SharedPreferences, key: String): SharPrefRepository =
+        SharPrefRepositoryImpl(sharPref, key)
 
-    private fun getSharPrefRepository(
-        app: Application,
-        nameOfFile: String,
-        key: String
-    ): SharPrefRepository =
-        SharPrefRepositoryImpl(app, nameOfFile, key)
+    fun provideSharPrefInteractor(sharPref: SharedPreferences, key: String): SharPrefInteractor =
+        SharPrefInteractorImpl(getSharPrefRepository(sharPref, key))
 
-    fun provideSharPrefInteractor(
-        app: Application,
-        nameOfFile: String,
-        key: String
-    ): SharPrefInteractor =
-        SharPrefInteractorImpl(getSharPrefRepository(app, nameOfFile, key))
+    private fun getSettingsSharPrefRepository(sharPref: SharedPreferences): SettingsSharPrefRepository =
+        SettingsSharPrefRepositoryImpl(sharPref)
 
-    private fun getSettingsSharPrefRepository(
-        app: Application
-    ): SettingsSharPrefRepository =
-        SettingsSharPrefRepositoryImpl(app)
-
-    fun provideSettingsInteractor(
-        app: Application
-    ): SettingsInteractor =
-        SettingsInteractorImpl(getSettingsSharPrefRepository(app))
+    fun provideSettingsInteractor(sharPref: SharedPreferences): SettingsInteractor =
+        SettingsInteractorImpl(getSettingsSharPrefRepository(sharPref))
 }

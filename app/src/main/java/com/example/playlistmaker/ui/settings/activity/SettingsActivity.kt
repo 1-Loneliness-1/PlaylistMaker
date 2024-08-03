@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.domain.settings.model.DarkThemeState
 import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
 
 class SettingsActivity : AppCompatActivity() {
@@ -16,7 +17,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<SettingsViewModel> {
         SettingsViewModel.getViewModelFactory(
-            application
+            application.getSharedPreferences(App.NAME_OF_FILE_WITH_DARK_MODE_CONDITION, MODE_PRIVATE)
         )
     }
 
@@ -31,11 +32,16 @@ class SettingsActivity : AppCompatActivity() {
         val userAgreementButton = binding.tvUserAgreement
         val themeSwitcher = binding.sNightTheme
 
-        themeSwitcher.isChecked =
-            if (viewModel.getDarkThemeStateFromSharPref() == null)
-                (applicationContext as App).getDarkModeState()
-            else
-                viewModel.getDarkThemeStateFromSharPref()!!
+        viewModel.getDarkThemeStateLiveData().observe(this) { darkThemeState ->
+            when (darkThemeState) {
+                is DarkThemeState.DarkTheme -> {
+                    themeSwitcher.isChecked =
+                        darkThemeState.isDarkThemeOn ?: (applicationContext as App).getDarkModeState()
+                }
+            }
+        }
+
+        viewModel.checkDarkThemeState()
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
             (applicationContext as App).switchTheme(checked)

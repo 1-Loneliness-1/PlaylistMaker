@@ -1,35 +1,37 @@
 package com.example.playlistmaker.ui.settings.view_model
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.settings.SettingsInteractor
+import com.example.playlistmaker.domain.settings.model.DarkThemeState
 
 class SettingsViewModel(
-    application: Application,
     private val settingsInteractor: SettingsInteractor
-) : AndroidViewModel(application) {
+) : ViewModel() {
+
+    private val darkThemeStateLiveData = MutableLiveData<DarkThemeState>()
+
+    fun getDarkThemeStateLiveData() : LiveData<DarkThemeState> = darkThemeStateLiveData
 
     companion object {
         fun getViewModelFactory(
-            app: Application
-        ): ViewModelProvider.Factory = viewModelFactory {
+            sharPref: SharedPreferences
+        ) : ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 SettingsViewModel(
-                    app,
-                    Creator.provideSettingsInteractor(app)
+                    Creator.provideSettingsInteractor(sharPref)
                 )
             }
         }
     }
 
-    fun getDarkThemeStateFromSharPref(): Boolean? =
-        settingsInteractor.getDarkThemeStateFromSharPref()
-
-    fun saveDarkThemeStateToSharPref(isDarkThemeEnabled: Boolean) =
-        settingsInteractor.saveDarkThemeStateToSharPref(isDarkThemeEnabled)
-
+    fun checkDarkThemeState() {
+        darkThemeStateLiveData.postValue(DarkThemeState.DarkTheme(settingsInteractor.getDarkThemeStateFromSharPref()))
+    }
 }

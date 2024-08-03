@@ -1,11 +1,10 @@
 package com.example.playlistmaker.data.search
 
-import android.app.Application
+import android.content.SharedPreferences
 import com.example.playlistmaker.domain.search.model.Track
 
 interface SharPrefRepository {
-    val app: Application
-    val nameOfFile: String
+    val sharPref: SharedPreferences
     val key: String
 
     fun getArrayListFromResource(): ArrayList<Track>

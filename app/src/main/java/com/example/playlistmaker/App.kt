@@ -13,7 +13,6 @@ class App : Application() {
     companion object {
         const val NAME_OF_FILE_WITH_DARK_MODE_CONDITION = "night_theme_on_off"
         const val KEY_OF_DARK_MODE = "is_dark_theme"
-        const val ITUNES_BASE_URL = "https://itunes.apple.com"
     }
 
     override fun onCreate() {

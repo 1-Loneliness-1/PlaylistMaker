@@ -1,5 +1,6 @@
 package com.example.playlistmaker.ui.search.activity
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +12,7 @@ import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.utils.DimenConvertor
 
 class TrackAdapter(
-    private val tracks: List<Track>,
+    private var tracks: List<Track> = emptyList(),
     private val onItemClicked: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
@@ -26,6 +27,18 @@ class TrackAdapter(
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setData(listOfTracks: List<Track>) {
+        tracks = listOfTracks
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun removeAllData() {
+        tracks = emptyList()
+        notifyDataSetChanged()
     }
 
     class TrackViewHolder(

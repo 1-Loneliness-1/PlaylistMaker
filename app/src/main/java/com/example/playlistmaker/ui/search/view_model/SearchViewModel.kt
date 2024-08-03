@@ -1,9 +1,9 @@
 package com.example.playlistmaker.ui.search.view_model
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -14,30 +14,48 @@ import com.example.playlistmaker.domain.search.model.SearchScreenState
 import com.example.playlistmaker.domain.search.model.Track
 
 class SearchViewModel(
-    application: Application,
     private val tracksInteractor: TracksInteractor,
-    val sharPrefInteractor: SharPrefInteractor
-) : AndroidViewModel(application) {
+    private val sharPrefInteractor: SharPrefInteractor
+) : ViewModel() {
 
-    private val searchScreenStateLiveData =
-        MutableLiveData<SearchScreenState>(SearchScreenState.Waiting)
+    private val searchScreenStateLiveData = MutableLiveData<SearchScreenState>(SearchScreenState.Waiting(getTracksFromSharPref()))
 
     fun getSearchScreenStateLiveData(): LiveData<SearchScreenState> = searchScreenStateLiveData
 
     companion object {
+        const val MAX_COUNT_OF_TRACKS_IN_SEARCH_HISTORY = 10
+
         fun getViewModelFactory(
-            app: Application,
-            nameOfFile: String,
+            sharPref: SharedPreferences,
             key: String
         ): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 SearchViewModel(
-                    app,
                     Creator.provideTracksInteractor(),
-                    Creator.provideSharPrefInteractor(app, nameOfFile, key)
+                    Creator.provideSharPrefInteractor(sharPref, key)
                 )
             }
         }
+    }
+
+    fun saveNewTrack(track: Track) {
+        val tracksInSearchHistory = getTracksFromSharPref()
+
+        tracksInSearchHistory.removeIf { it.trackId == track.trackId }
+
+        if (tracksInSearchHistory.size == MAX_COUNT_OF_TRACKS_IN_SEARCH_HISTORY) {
+            tracksInSearchHistory.removeAt(tracksInSearchHistory.lastIndex)
+        }
+
+        tracksInSearchHistory.add(0, track)
+        sharPrefInteractor.putResToSharPref(tracksInSearchHistory)
+    }
+
+    private fun getTracksFromSharPref(): ArrayList<Track> =
+        sharPrefInteractor.getResFromSharPref()
+
+    fun removeAllTracks() {
+        sharPrefInteractor.removeAllRes()
     }
 
     fun getTracksForList(exp: String, consume: (List<Track>) -> Unit) {
@@ -46,7 +64,7 @@ class SearchViewModel(
     }
 
     fun setWaitingStateForScreen() {
-        searchScreenStateLiveData.postValue(SearchScreenState.Waiting)
+        searchScreenStateLiveData.postValue(SearchScreenState.Waiting(getTracksFromSharPref()))
     }
 
     fun setContentStateOfScreen(listOfTracks: List<Track>) {

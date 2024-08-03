@@ -8,7 +8,4 @@ class SettingsInteractorImpl(
 ) : SettingsInteractor {
     override fun getDarkThemeStateFromSharPref(): Boolean? =
         settingsSharPrefRepository.getDarkThemeStateFromSharPref()
-
-    override fun saveDarkThemeStateToSharPref(isDarkThemeEnabled: Boolean) =
-        settingsSharPrefRepository.saveDarkThemeState(isDarkThemeEnabled)
 }

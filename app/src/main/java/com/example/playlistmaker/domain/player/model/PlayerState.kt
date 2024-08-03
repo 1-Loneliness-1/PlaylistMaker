@@ -3,6 +3,8 @@ package com.example.playlistmaker.domain.player.model
 sealed class PlayerState {
     object DefaultState : PlayerState()
     object PreparedState : PlayerState()
-    object PlayingState : PlayerState()
+    data class PlayingState(
+        val currentPosition: String
+    ) : PlayerState()
     object PausedState : PlayerState()
 }

@@ -23,11 +23,12 @@ class PlayerActivity : AppCompatActivity() {
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val consume: (Int) -> Unit = { _ ->
+        mainHandler.removeCallbacksAndMessages(null)
         viewModel.setPrepState()
     }
     private val updateTextViewRunnable = object : Runnable {
         override fun run() {
-            currentTrackTime.text = viewModel.getCurrentPositionOfTrack()
+            viewModel.updateCurrentPositionOfTrack()
             mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
         }
     }
@@ -81,9 +82,11 @@ class PlayerActivity : AppCompatActivity() {
 
                 is PlayerState.PlayingState -> {
                     changeStateOfElements(STATE_PLAYING)
+                    currentTrackTime.text = playerState.currentPosition
                 }
 
                 is PlayerState.PausedState -> {
+                    mainHandler.removeCallbacksAndMessages(null)
                     changeStateOfElements(STATE_PAUSED)
                 }
             }

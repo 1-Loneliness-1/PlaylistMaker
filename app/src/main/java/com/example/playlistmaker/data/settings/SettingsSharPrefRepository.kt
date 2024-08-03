@@ -1,10 +1,9 @@
 package com.example.playlistmaker.data.settings
 
-import android.app.Application
+import android.content.SharedPreferences
 
 interface SettingsSharPrefRepository {
-    val app: Application
+    val sharPref: SharedPreferences
 
     fun getDarkThemeStateFromSharPref(): Boolean?
-    fun saveDarkThemeState(isDarkThemeEnabled: Boolean)
 }

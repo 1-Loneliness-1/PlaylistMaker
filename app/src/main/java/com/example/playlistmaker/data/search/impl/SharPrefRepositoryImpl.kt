@@ -1,7 +1,6 @@
 package com.example.playlistmaker.data.search.impl
 
-import android.app.Application
-import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
 import com.example.playlistmaker.data.search.SharPrefRepository
@@ -10,14 +9,12 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class SharPrefRepositoryImpl(
-    override val app: Application,
-    override val nameOfFile: String,
+    override val sharPref: SharedPreferences,
     override val key: String
 ) : SharPrefRepository {
 
-    private val sharPref = app.getSharedPreferences(nameOfFile, MODE_PRIVATE)
     private var listener: OnSharedPreferenceChangeListener =
-        OnSharedPreferenceChangeListener() { _, _ ->
+        OnSharedPreferenceChangeListener { _, _ ->
 
         }
 
@@ -38,7 +35,7 @@ class SharPrefRepositoryImpl(
     }
 
     override fun registerChangeListener(listener: () -> Unit) {
-        this.listener = OnSharedPreferenceChangeListener() { _, _ ->
+        this.listener = OnSharedPreferenceChangeListener { _, _ ->
             listener.invoke()
         }
         sharPref.registerOnSharedPreferenceChangeListener(this.listener)

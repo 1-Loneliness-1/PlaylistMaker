@@ -31,7 +31,7 @@ class PlayerViewModel(
 
     fun startPlayer() {
         playerInteractor.startPlayer()
-        playerStatusLiveData.postValue(PlayerState.PlayingState)
+        playerStatusLiveData.postValue(PlayerState.PlayingState("00:00"))
     }
 
     fun pausePlayer() {
@@ -47,8 +47,9 @@ class PlayerViewModel(
         playerStatusLiveData.postValue(PlayerState.PreparedState)
     }
 
-    fun getCurrentPositionOfTrack(): String =
-        playerInteractor.getCurrentPosition()
+    fun updateCurrentPositionOfTrack() {
+        playerStatusLiveData.postValue(PlayerState.PlayingState(playerInteractor.getCurrentPosition()))
+    }
 
     fun setPrepState() =
         playerStatusLiveData.postValue(PlayerState.PreparedState)

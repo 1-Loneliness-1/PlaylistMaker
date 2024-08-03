@@ -46,8 +46,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySearchBinding
     private val viewModel by viewModels<SearchViewModel> {
         SearchViewModel.getViewModelFactory(
-            application,
-            NAME_FOR_FILE_WITH_SEARCH_HISTORY,
+            application.getSharedPreferences(NAME_FOR_FILE_WITH_SEARCH_HISTORY, MODE_PRIVATE),
             KEY_FOR_ARRAY_WITH_SEARCH_HISTORY
         )
     }
@@ -70,8 +69,6 @@ class SearchActivity : AppCompatActivity() {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val TAP_DEBOUNCE_DELAY = 1000L
-        private val trackList = ArrayList<Track>()
-        private val searchHistoryList = ArrayList<Track>()
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -79,34 +76,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel.getSearchScreenStateLiveData().observe(this) { screenState ->
-            when (screenState) {
-                is SearchScreenState.Waiting -> {
-                    //Hiding all elements on the screen
-                    changeVisibilityOfElements(false, "Hide all")
-                }
-                is SearchScreenState.Loading -> {
-                    //Showing progressbar? or something different
-                    changeVisibilityOfElements(false)
-                }
-                is SearchScreenState.Content -> {
-                    trackList.clear()
-                    //Showing necessary elements and hiding progress bar
-                    if (screenState.listOfFoundedTracks.isEmpty()) {
-                        adapter.notifyDataSetChanged()
-                        changeVisibilityOfElements(true, "Nothing found")
-                    } else if (screenState.listOfFoundedTracks[0].trackId.toInt() == -1) {
-                        adapter.notifyDataSetChanged()
-                        changeVisibilityOfElements(true, "No internet")
-                    } else {
-                        trackList.addAll(screenState.listOfFoundedTracks)
-                        adapter.notifyDataSetChanged()
-                        changeVisibilityOfElements(true)
-                    }
-                }
-            }
-        }
 
         searchEditText = binding.etSearch
         clearSearchEditTextButton = binding.ivClearEditText
@@ -121,12 +90,10 @@ class SearchActivity : AppCompatActivity() {
         youLookedForText = binding.tvYouLookedFor
         progressBarTrackListLoading = binding.pbListOfTracksLoading
 
-        val searchHistory = SearchHistory(viewModel.sharPrefInteractor)
-
-        adapter = TrackAdapter(trackList) {
+        adapter = TrackAdapter {
             if (isNotPressed) {
                 tapDebounce()
-                searchHistory.saveNewTrack(it)
+                viewModel.saveNewTrack(it)
 
                 //Implementation of putting information for Player Activity by putExtra fun in Intent
                 val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
@@ -137,11 +104,10 @@ class SearchActivity : AppCompatActivity() {
         searchTracksRecycler.adapter = adapter
 
         //Setting adapter for search history list
-        searchHistoryList.addAll(searchHistory.tracksInSearchHistory)
-        searchHistoryAdapter = TrackAdapter(searchHistoryList) {
+        searchHistoryAdapter = TrackAdapter {
             if (isNotPressed) {
                 tapDebounce()
-                searchHistory.saveNewTrack(it)
+                viewModel.saveNewTrack(it)
 
                 //Implementation of putting information for Player Activity by putExtra fun in Intent
                 val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
@@ -150,6 +116,24 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         searchHistoryRecycler.adapter = searchHistoryAdapter
+
+        viewModel.getSearchScreenStateLiveData().observe(this) { screenState ->
+            when (screenState) {
+                is SearchScreenState.Waiting -> {
+                    searchHistoryAdapter.setData(screenState.tracksInSearchHistory)
+                    changeVisibilityOfElements(screenState)
+                }
+                is SearchScreenState.Loading -> {
+                    changeVisibilityOfElements(screenState)
+                }
+                is SearchScreenState.Content -> {
+                    changeVisibilityOfElements(screenState)
+                    if (screenState.listOfFoundedTracks.isNotEmpty() && screenState.listOfFoundedTracks[0].trackId.toInt() != -1) {
+                        adapter.setData(screenState.listOfFoundedTracks)
+                    }
+                }
+            }
+        }
 
         binding.ivBackToPreviousScreen.setOnClickListener { finish() }
 
@@ -173,8 +157,7 @@ class SearchActivity : AppCompatActivity() {
 
             viewModel.setWaitingStateForScreen()
 
-            trackList.clear()
-            adapter.notifyDataSetChanged()
+            adapter.removeAllData()
         }
 
         searchEditText.doAfterTextChanged { s ->
@@ -186,30 +169,27 @@ class SearchActivity : AppCompatActivity() {
             if (s?.isNotEmpty() == true) {
                 searchDebounce()
             } else {
-                mainHandler.removeCallbacksAndMessages(searchRunnable)
+                mainHandler.removeCallbacksAndMessages(null)
                 viewModel.setWaitingStateForScreen()
             }
         }
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             val conditionOfSearchEditText = hasFocus &&
                     searchEditText.text?.isEmpty() == true &&
-                    searchHistoryList.isNotEmpty()
+                    searchHistoryAdapter.itemCount > 0
             changeVisibilityOfSearchHistoryElements(conditionOfSearchEditText)
         }
 
         //Implementation of on click listener for clear search history button
         clearHistoryButton.setOnClickListener {
-            searchHistory.removeAllTracks()
-            searchHistoryList.clear()
-            searchHistoryAdapter.notifyDataSetChanged()
+            viewModel.removeAllTracks()
+            searchHistoryAdapter.removeAllData()
             changeVisibilityOfSearchHistoryElements(false)
         }
 
         //Implementation of change listener for instance of shared preferences
         listener = {
-            searchHistoryList.clear()
-            searchHistoryList.addAll(searchHistory.tracksInSearchHistory)
-            searchHistoryAdapter.notifyDataSetChanged()
+            //You can do everything here)
         }
 
     }
@@ -244,71 +224,76 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setText(currentTextInEditText)
     }
 
-    private fun changeVisibilityOfElements(visibility: Boolean, case: String = "Normally") {
+    private fun changeVisibilityOfElements(case: SearchScreenState) {
+
         when (case) {
-            "Hide all" -> {
-                binding.pbListOfTracksLoading.isVisible = false
-                binding.rvTrackSearchList.isVisible = false
+            is SearchScreenState.Waiting -> {
+                progressBarTrackListLoading.isVisible = false
+                searchTracksRecycler.isVisible = false
 
-                searchEditText.isFocusableInTouchMode = true
-                clearSearchEditTextButton.isEnabled = true
-                clearSearchEditTextButton.isClickable = true
+                changeParamsOfSearchEditText(true)
 
-                binding.tvErrorNoInternet.isVisible = false
-                binding.tvErrorNothingFound.isVisible = false
-                binding.ivNoInternetPlaceholder.isVisible = false
-                binding.ivNothingFoundPlaceholder.isVisible = false
-                binding.bRefreshRequest.isVisible = false
+                errorNoInternetText.isVisible = false
+                errorNothingFoundText.isVisible = false
+                noInternetPlaceholder.isVisible = false
+                noResultsPlaceholder.isVisible = false
+                refreshButton.isVisible = false
 
-                changeVisibilityOfSearchHistoryElements(currentTextInEditText.isEmpty() && searchHistoryList.isNotEmpty())
+                changeVisibilityOfSearchHistoryElements(currentTextInEditText.isEmpty() && searchHistoryAdapter.itemCount > 0)
             }
-            "Normally" -> {
-                binding.pbListOfTracksLoading.isVisible = !visibility
-                binding.rvTrackSearchList.isVisible = visibility
+            is SearchScreenState.Content -> {
 
-                searchEditText.isFocusableInTouchMode = true
-                clearSearchEditTextButton.isEnabled = true
-                clearSearchEditTextButton.isClickable = true
+                if (case.listOfFoundedTracks.isEmpty()) {
+                    progressBarTrackListLoading.isVisible = false
+                    searchTracksRecycler.isVisible = false
 
-                binding.tvErrorNoInternet.isVisible = false
-                binding.tvErrorNothingFound.isVisible = false
-                binding.ivNoInternetPlaceholder.isVisible = false
-                binding.ivNothingFoundPlaceholder.isVisible = false
-                binding.bRefreshRequest.isVisible = false
+                    changeParamsOfSearchEditText(true)
 
-                changeVisibilityOfSearchHistoryElements(false)
-            }
-            "Nothing found" -> {
-                binding.pbListOfTracksLoading.isVisible = false
-                binding.rvTrackSearchList.isVisible = false
+                    errorNoInternetText.isVisible = false
+                    noInternetPlaceholder.isVisible = false
+                    refreshButton.isVisible = false
 
-                searchEditText.isFocusableInTouchMode = true
-                clearSearchEditTextButton.isEnabled = true
-                clearSearchEditTextButton.isClickable = true
+                    changeVisibilityOfSearchHistoryElements(false)
+                } else if ((case.listOfFoundedTracks[0].trackId.toInt() == -1)) {
+                    progressBarTrackListLoading.isVisible = false
+                    searchTracksRecycler.isVisible = false
 
-                binding.tvErrorNoInternet.isVisible = false
-                binding.ivNoInternetPlaceholder.isVisible = false
-                binding.bRefreshRequest.isVisible = false
+                    changeParamsOfSearchEditText(false)
 
-                if (currentTextInEditText.isEmpty()) {
-                    viewModel.setWaitingStateForScreen()
+                    errorNoInternetText.isVisible = true
+                    errorNothingFoundText.isVisible = false
+                    noInternetPlaceholder.isVisible = true
+                    noResultsPlaceholder.isVisible = false
+                    refreshButton.isVisible = true
+
+                    changeVisibilityOfSearchHistoryElements(false)
+                } else {
+                    progressBarTrackListLoading.isVisible = false
+                    searchTracksRecycler.isVisible = true
+
+                    changeParamsOfSearchEditText(true)
+
+                    errorNoInternetText.isVisible = false
+                    errorNothingFoundText.isVisible = false
+                    noInternetPlaceholder.isVisible = false
+                    noResultsPlaceholder.isVisible = false
+                    refreshButton.isVisible = false
+
+                    changeVisibilityOfSearchHistoryElements(false)
                 }
 
-                changeVisibilityOfSearchHistoryElements(false)
             }
-            "No internet" -> {
-                binding.pbListOfTracksLoading.isVisible = false
-                binding.rvTrackSearchList.isVisible = false
+            is SearchScreenState.Loading -> {
+                progressBarTrackListLoading.isVisible = true
+                searchTracksRecycler.isVisible = false
 
-                searchEditText.isFocusableInTouchMode = false
-                clearSearchEditTextButton.isEnabled = false
-                clearSearchEditTextButton.isClickable = false
+                changeParamsOfSearchEditText(true)
 
-                binding.tvErrorNoInternet.isVisible = true
-                binding.tvErrorNothingFound.isVisible = false
-                binding.ivNoInternetPlaceholder.isVisible = true
-                binding.ivNothingFoundPlaceholder.isVisible = false
-                binding.bRefreshRequest.isVisible = true
+                errorNoInternetText.isVisible = false
+                errorNothingFoundText.isVisible = false
+                noInternetPlaceholder.isVisible = false
+                noResultsPlaceholder.isVisible = false
+                refreshButton.isVisible = false
 
                 changeVisibilityOfSearchHistoryElements(false)
             }
@@ -318,13 +303,19 @@ class SearchActivity : AppCompatActivity() {
     //Function for changing visibility of all elements for displaying search history:
     //text "You looked", recycler view and button "Clear history"
     private fun changeVisibilityOfSearchHistoryElements(visible: Boolean) {
-        binding.bClearSearchHistory.isVisible = visible
-        binding.rvSearchHistory.isVisible = visible
-        binding.tvYouLookedFor.isVisible = visible
+        clearHistoryButton.isVisible = visible
+        searchHistoryRecycler.isVisible = visible
+        youLookedForText.isVisible = visible
+    }
+
+    private fun changeParamsOfSearchEditText(isEditTextAvailable: Boolean) {
+        searchEditText.isFocusableInTouchMode = isEditTextAvailable
+        clearSearchEditTextButton.isEnabled = isEditTextAvailable
+        clearSearchEditTextButton.isClickable = isEditTextAvailable
     }
 
     private fun searchDebounce() {
-        mainHandler.removeCallbacksAndMessages(searchRunnable)
+        mainHandler.removeCallbacksAndMessages(null)
         if (searchEditText.text?.isNotEmpty() == true)
             mainHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
