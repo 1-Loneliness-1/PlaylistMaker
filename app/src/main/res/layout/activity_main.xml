@@ -16,6 +16,7 @@
         android:textColor="@color/yp_white" />
 
     <LinearLayout
+        android:id="@+id/llMainButtons"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

@@ -1,17 +1,10 @@
 package com.example.playlistmaker.data.mediaplayer
 
-interface Playable {
-    val consume: (Int) -> Unit
-
+interface PlayerRepository {
     fun startPlayer()
-
     fun pausePlayer()
-
     fun stopPlayer()
-
-    fun getCurrentPositionOfPlayer(): String
-
+    fun getCurrentPositionOfTrackTime(): String
     fun releaseResourcesForPlayer()
-
     fun preparePlayer(urlOfMusic: String)
 }
