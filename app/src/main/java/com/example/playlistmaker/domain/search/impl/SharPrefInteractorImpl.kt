@@ -7,6 +7,7 @@ import com.example.playlistmaker.domain.search.model.Track
 class SharPrefInteractorImpl(
     private val sharPrefRepository: SharPrefRepository
 ) : SharPrefInteractor {
+
     override fun getResFromSharPref(): ArrayList<Track> =
         sharPrefRepository.getArrayListFromResource()
 

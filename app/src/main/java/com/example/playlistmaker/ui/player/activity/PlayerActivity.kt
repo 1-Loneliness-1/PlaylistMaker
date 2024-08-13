@@ -6,7 +6,6 @@ import android.os.Looper
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
@@ -18,6 +17,8 @@ import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
 import com.example.playlistmaker.utils.DimenConvertor
 import com.google.gson.Gson
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -32,8 +33,8 @@ class PlayerActivity : AppCompatActivity() {
             mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
         }
     }
-    private val viewModel by viewModels<PlayerViewModel> {
-        PlayerViewModel.getViewModelFactory(consume)
+    private val viewModel: PlayerViewModel by viewModel {
+        parametersOf(consume)
     }
 
     private lateinit var playStopButton: ImageButton
@@ -92,7 +93,10 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        backToPrevScreenButton.setOnClickListener { finish() }
+        backToPrevScreenButton.setOnClickListener {
+
+            finish()
+        }
 
         val json: String? = intent.getStringExtra(KEY_FOR_INTENT_DATA)
         currentTrack = Gson().fromJson(json, Track::class.java)

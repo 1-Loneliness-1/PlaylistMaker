@@ -3,20 +3,21 @@ package com.example.playlistmaker.ui.settings.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.playlistmaker.App
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySettingsBinding
 import com.example.playlistmaker.domain.settings.model.DarkThemeState
 import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 
-    private val viewModel by viewModels<SettingsViewModel> {
-        SettingsViewModel.getViewModelFactory(
+    private val viewModel: SettingsViewModel by viewModel {
+        parametersOf(
             application.getSharedPreferences(App.NAME_OF_FILE_WITH_DARK_MODE_CONDITION, MODE_PRIVATE)
         )
     }
