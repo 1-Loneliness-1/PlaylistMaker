@@ -1,6 +1,8 @@
 package com.example.playlistmaker.di
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.media.MediaPlayer
 import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.mediaplayer.Playable
 import com.example.playlistmaker.data.mediaplayer.PlayerForMusic
@@ -13,35 +15,42 @@ import com.example.playlistmaker.data.search.impl.SharPrefRepositoryImpl
 import com.example.playlistmaker.data.search.impl.TracksRepositoryImpl
 import com.example.playlistmaker.data.settings.SettingsSharPrefRepository
 import com.example.playlistmaker.data.settings.impl.SettingsSharPrefRepositoryImpl
-import org.koin.core.parameter.parametersOf
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.bind
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val dataModule = module {
-    factory<PlayerRepository> { (consume: (Int) -> Unit) ->
-        PlayerRepositoryImpl(
-            get {
-                parametersOf(consume)
-            }
-        )
+
+    factoryOf(::PlayerRepositoryImpl) {
+        bind<PlayerRepository>()
     }
 
-    factory<Playable> { (consume: (Int) -> Unit) ->
-        PlayerForMusic(consume)
+    factoryOf(::PlayerForMusic) {
+        bind<Playable>()
     }
 
-    single<TracksRepository> {
-        TracksRepositoryImpl(get())
+    factoryOf(::TracksRepositoryImpl) {
+        bind<TracksRepository>()
     }
 
-    single<NetworkClient> {
-        RetrofitNetworkClient()
+    factoryOf(::RetrofitNetworkClient) {
+        bind<NetworkClient>()
     }
 
-    single<SharPrefRepository> { (sharPref: SharedPreferences, key: String) ->
-        SharPrefRepositoryImpl(sharPref, key)
+    factoryOf(::SharPrefRepositoryImpl) {
+        bind<SharPrefRepository>()
     }
 
-    single<SettingsSharPrefRepository> { (sharPref: SharedPreferences) ->
-        SettingsSharPrefRepositoryImpl(sharPref)
+    factoryOf(::SettingsSharPrefRepositoryImpl) {
+        bind<SettingsSharPrefRepository>()
+    }
+
+    factory<SharedPreferences> { (name: String) ->
+        androidContext().getSharedPreferences(name, Context.MODE_PRIVATE)
+    }
+
+    factory {
+        MediaPlayer()
     }
 }
