@@ -23,7 +23,6 @@ import com.example.playlistmaker.ui.player.activity.PlayerActivity
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class SearchActivity : AppCompatActivity() {
 
@@ -45,12 +44,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var adapter: TrackAdapter
     private lateinit var searchHistoryAdapter: TrackAdapter
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModel {
-        parametersOf(
-            application.getSharedPreferences(NAME_FOR_FILE_WITH_SEARCH_HISTORY, MODE_PRIVATE),
-            KEY_FOR_ARRAY_WITH_SEARCH_HISTORY
-        )
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable {
@@ -65,8 +59,6 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         const val TEXT_IN_SEARCH_EDIT_TEXT = "TEXT_IN_SEARCH_EDIT_TEXT"
-        const val NAME_FOR_FILE_WITH_SEARCH_HISTORY = "search_history"
-        const val KEY_FOR_ARRAY_WITH_SEARCH_HISTORY = "elems_in_search_history"
         private const val KEY_FOR_INTENT_DATA = "Selected track"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val TAP_DEBOUNCE_DELAY = 1000L

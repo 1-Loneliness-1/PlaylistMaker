@@ -5,7 +5,6 @@ import com.example.playlistmaker.domain.search.model.Track
 
 interface SharPrefRepository {
     val sharPref: SharedPreferences
-    val key: String
 
     fun getArrayListFromResource(): ArrayList<Track>
     fun putArrayListInSharPref(res: ArrayList<Track>)
