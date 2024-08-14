@@ -19,6 +19,7 @@ class PlayerRepositoryImpl(
     override fun releaseResourcesForPlayer() =
         mediaPlayer.releaseResourcesForPlayer()
 
-    override fun preparePlayer(urlOfMusic: String) = mediaPlayer.preparePlayer(urlOfMusic)
+    override fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit) =
+        mediaPlayer.preparePlayer(urlOfMusic, consume)
 
 }

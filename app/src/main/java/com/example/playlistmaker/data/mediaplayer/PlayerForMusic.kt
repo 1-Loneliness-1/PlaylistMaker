@@ -5,10 +5,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class PlayerForMusic(
-    override val consume: (Int) -> Unit
+    override val mediaPlayer: MediaPlayer
 ) : Playable {
-
-    private val mediaPlayer = MediaPlayer()
 
     companion object {
         private const val STATE_PREPARED = 1
@@ -34,7 +32,7 @@ class PlayerForMusic(
 
     override fun releaseResourcesForPlayer() = mediaPlayer.release()
 
-    override fun preparePlayer(urlOfMusic: String) {
+    override fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit) {
         mediaPlayer.setDataSource(urlOfMusic)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {

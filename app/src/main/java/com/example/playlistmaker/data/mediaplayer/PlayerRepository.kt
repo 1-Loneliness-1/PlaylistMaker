@@ -6,5 +6,5 @@ interface PlayerRepository {
     fun stopPlayer()
     fun getCurrentPositionOfTrackTime(): String
     fun releaseResourcesForPlayer()
-    fun preparePlayer(urlOfMusic: String)
+    fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit)
 }

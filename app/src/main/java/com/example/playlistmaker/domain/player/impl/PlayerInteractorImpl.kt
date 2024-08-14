@@ -18,5 +18,6 @@ class PlayerInteractorImpl(
 
     override fun releaseResourcesForPlayer() = mediaPlayerRepository.releaseResourcesForPlayer()
 
-    override fun prepPlayer(urlOfMusic: String) = mediaPlayerRepository.preparePlayer(urlOfMusic)
+    override fun prepPlayer(urlOfMusic: String, consume: (Int) -> Unit) =
+        mediaPlayerRepository.preparePlayer(urlOfMusic, consume)
 }

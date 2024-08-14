@@ -18,7 +18,6 @@ import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
 import com.example.playlistmaker.utils.DimenConvertor
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class PlayerActivity : AppCompatActivity() {
 
@@ -33,9 +32,7 @@ class PlayerActivity : AppCompatActivity() {
             mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
         }
     }
-    private val viewModel: PlayerViewModel by viewModel {
-        parametersOf(consume)
-    }
+    private val viewModel: PlayerViewModel by viewModel()
 
     private lateinit var playStopButton: ImageButton
     private lateinit var currentTrackTime: TextView
@@ -87,16 +84,12 @@ class PlayerActivity : AppCompatActivity() {
                 }
 
                 is PlayerState.PausedState -> {
-                    mainHandler.removeCallbacksAndMessages(null)
                     changeStateOfElements(STATE_PAUSED)
                 }
             }
         }
 
-        backToPrevScreenButton.setOnClickListener {
-
-            finish()
-        }
+        backToPrevScreenButton.setOnClickListener { finish() }
 
         val json: String? = intent.getStringExtra(KEY_FOR_INTENT_DATA)
         currentTrack = Gson().fromJson(json, Track::class.java)
@@ -119,7 +112,7 @@ class PlayerActivity : AppCompatActivity() {
             Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_SHORT).show()
         }
 
-        viewModel.preparePlayer(currentTrack.previewUrl)
+        viewModel.preparePlayer(currentTrack.previewUrl, consume)
 
         playStopButton.setOnClickListener {
             when (viewModel.getPlayerStatusLiveData().value) {
@@ -128,6 +121,7 @@ class PlayerActivity : AppCompatActivity() {
                 }
 
                 is PlayerState.PlayingState -> {
+                    mainHandler.removeCallbacksAndMessages(null)
                     viewModel.pausePlayer()
                 }
 
@@ -146,7 +140,7 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
+        mainHandler.removeCallbacksAndMessages(null)
         viewModel.releasePlayer()
     }
 
@@ -154,24 +148,25 @@ class PlayerActivity : AppCompatActivity() {
     private fun changeStateOfElements(currentState: Int) {
         when (currentState) {
             STATE_DEFAULT -> {
-                binding.ibPlayStop.isEnabled = false
+                playStopButton.isClickable = false
+                playStopButton.alpha = 0.5f
             }
 
             STATE_PREPARED -> {
-                playStopButton.isEnabled = true
-                playStopButton.setImageResource(R.drawable.play_icon)
                 mainHandler.removeCallbacksAndMessages(null)
+                playStopButton.isClickable = true
+                playStopButton.alpha = 1.0f
+                playStopButton.setImageResource(R.drawable.play_icon)
                 currentTrackTime.text = resources.getString(R.string.start_time)
             }
 
             STATE_PLAYING -> {
-                binding.ibPlayStop.setImageResource(R.drawable.pause_icon)
+                playStopButton.setImageResource(R.drawable.pause_icon)
                 mainHandler.post(updateTextViewRunnable)
             }
 
             STATE_PAUSED -> {
-                binding.ibPlayStop.setImageResource(R.drawable.play_icon)
-                mainHandler.removeCallbacksAndMessages(updateTextViewRunnable)
+                playStopButton.setImageResource(R.drawable.play_icon)
             }
         }
     }

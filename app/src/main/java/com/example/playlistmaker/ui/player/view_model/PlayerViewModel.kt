@@ -10,13 +10,20 @@ class PlayerViewModel(
     private val playerInteractor: PlayerInteractor
 ) : ViewModel() {
 
-    private var playerStatusLiveData = MutableLiveData<PlayerState>(PlayerState.DefaultState)
+    private val playerStatusLiveData = MutableLiveData<PlayerState>(PlayerState.DefaultState)
 
     fun getPlayerStatusLiveData(): LiveData<PlayerState> = playerStatusLiveData
 
     fun startPlayer() {
         playerInteractor.startPlayer()
-        playerStatusLiveData.postValue(PlayerState.PlayingState("00:00"))
+        playerStatusLiveData.postValue(
+            PlayerState.PlayingState(
+                if (playerStatusLiveData.value is PlayerState.PreparedState)
+                    "00:00"
+                else
+                    playerInteractor.getCurrentPosition()
+            )
+        )
     }
 
     fun pausePlayer() {
@@ -27,8 +34,8 @@ class PlayerViewModel(
     fun releasePlayer() =
         playerInteractor.releaseResourcesForPlayer()
 
-    fun preparePlayer(urlOfMusic: String) {
-        playerInteractor.prepPlayer(urlOfMusic)
+    fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit) {
+        playerInteractor.prepPlayer(urlOfMusic, consume)
         playerStatusLiveData.postValue(PlayerState.PreparedState)
     }
 
