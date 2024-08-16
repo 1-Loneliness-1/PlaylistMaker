@@ -7,13 +7,10 @@ import com.example.playlistmaker.data.search.SharPrefRepository
 import com.example.playlistmaker.domain.search.model.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import org.koin.core.parameter.parametersOf
-import org.koin.java.KoinJavaComponent.getKoin
 
-class SharPrefRepositoryImpl : SharPrefRepository {
-    override val sharPref: SharedPreferences by getKoin().inject {
-        parametersOf(NAME_FOR_FILE_WITH_SEARCH_HISTORY)
-    }
+class SharPrefRepositoryImpl(
+    override val sharPref: SharedPreferences
+) : SharPrefRepository {
 
     private var listener: OnSharedPreferenceChangeListener =
         OnSharedPreferenceChangeListener { _, _ ->
@@ -21,7 +18,6 @@ class SharPrefRepositoryImpl : SharPrefRepository {
         }
 
     companion object {
-        private const val NAME_FOR_FILE_WITH_SEARCH_HISTORY = "search_history"
         private const val KEY_FOR_ARRAY_WITH_SEARCH_HISTORY = "elems_in_search_history"
     }
 

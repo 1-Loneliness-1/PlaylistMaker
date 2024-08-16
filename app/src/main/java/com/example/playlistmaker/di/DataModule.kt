@@ -18,6 +18,7 @@ import com.example.playlistmaker.data.settings.impl.SettingsSharPrefRepositoryIm
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val dataModule = module {
@@ -38,12 +39,12 @@ val dataModule = module {
         bind<NetworkClient>()
     }
 
-    factoryOf(::SharPrefRepositoryImpl) {
-        bind<SharPrefRepository>()
+    factory<SharPrefRepository> {
+        SharPrefRepositoryImpl(get { parametersOf("search_history") })
     }
 
-    factoryOf(::SettingsSharPrefRepositoryImpl) {
-        bind<SettingsSharPrefRepository>()
+    factory<SettingsSharPrefRepository> {
+        SettingsSharPrefRepositoryImpl(get { parametersOf("night_theme_on_off") })
     }
 
     factory<SharedPreferences> { (name: String) ->
