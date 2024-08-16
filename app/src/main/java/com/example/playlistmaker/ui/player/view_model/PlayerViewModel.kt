@@ -3,35 +3,27 @@ package com.example.playlistmaker.ui.player.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.domain.player.impl.PlayerInteractor
+import com.example.playlistmaker.domain.player.PlayerInteractor
 import com.example.playlistmaker.domain.player.model.PlayerState
 
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor
 ) : ViewModel() {
 
-    private var playerStatusLiveData = MutableLiveData<PlayerState>(PlayerState.DefaultState)
+    private val playerStatusLiveData = MutableLiveData<PlayerState>(PlayerState.DefaultState)
 
     fun getPlayerStatusLiveData(): LiveData<PlayerState> = playerStatusLiveData
 
-    companion object {
-        fun getViewModelFactory(consume: (Int) -> Unit): ViewModelProvider.Factory =
-            viewModelFactory {
-                initializer {
-                    PlayerViewModel(
-                        Creator.providePlayerInteractor(consume)
-                    )
-                }
-            }
-    }
-
     fun startPlayer() {
         playerInteractor.startPlayer()
-        playerStatusLiveData.postValue(PlayerState.PlayingState("00:00"))
+        playerStatusLiveData.postValue(
+            PlayerState.PlayingState(
+                if (playerStatusLiveData.value is PlayerState.PreparedState)
+                    "00:00"
+                else
+                    playerInteractor.getCurrentPosition()
+            )
+        )
     }
 
     fun pausePlayer() {
@@ -42,8 +34,8 @@ class PlayerViewModel(
     fun releasePlayer() =
         playerInteractor.releaseResourcesForPlayer()
 
-    fun preparePlayer(urlOfMusic: String) {
-        playerInteractor.prepPlayer(urlOfMusic)
+    fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit) {
+        playerInteractor.prepPlayer(urlOfMusic, consume)
         playerStatusLiveData.postValue(PlayerState.PreparedState)
     }
 

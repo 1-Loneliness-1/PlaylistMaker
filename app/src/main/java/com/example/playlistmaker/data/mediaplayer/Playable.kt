@@ -1,7 +1,9 @@
 package com.example.playlistmaker.data.mediaplayer
 
+import android.media.MediaPlayer
+
 interface Playable {
-    val consume: (Int) -> Unit
+    val mediaPlayer: MediaPlayer
 
     fun startPlayer()
 
@@ -13,5 +15,6 @@ interface Playable {
 
     fun releaseResourcesForPlayer()
 
-    fun preparePlayer(urlOfMusic: String)
+    fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit)
+
 }

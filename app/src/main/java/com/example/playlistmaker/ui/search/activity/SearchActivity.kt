@@ -12,7 +12,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -23,6 +22,7 @@ import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.google.gson.Gson
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
@@ -44,12 +44,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var adapter: TrackAdapter
     private lateinit var searchHistoryAdapter: TrackAdapter
     private lateinit var binding: ActivitySearchBinding
-    private val viewModel by viewModels<SearchViewModel> {
-        SearchViewModel.getViewModelFactory(
-            application.getSharedPreferences(NAME_FOR_FILE_WITH_SEARCH_HISTORY, MODE_PRIVATE),
-            KEY_FOR_ARRAY_WITH_SEARCH_HISTORY
-        )
-    }
+    private val viewModel: SearchViewModel by viewModel()
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable {
@@ -64,8 +59,6 @@ class SearchActivity : AppCompatActivity() {
 
     companion object {
         const val TEXT_IN_SEARCH_EDIT_TEXT = "TEXT_IN_SEARCH_EDIT_TEXT"
-        const val NAME_FOR_FILE_WITH_SEARCH_HISTORY = "search_history"
-        const val KEY_FOR_ARRAY_WITH_SEARCH_HISTORY = "elems_in_search_history"
         private const val KEY_FOR_INTENT_DATA = "Selected track"
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val TAP_DEBOUNCE_DELAY = 1000L
@@ -108,6 +101,7 @@ class SearchActivity : AppCompatActivity() {
             if (isNotPressed) {
                 tapDebounce()
                 viewModel.saveNewTrack(it)
+                viewModel.setWaitingStateForScreen()
 
                 //Implementation of putting information for Player Activity by putExtra fun in Intent
                 val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
@@ -189,7 +183,7 @@ class SearchActivity : AppCompatActivity() {
 
         //Implementation of change listener for instance of shared preferences
         listener = {
-            //You can do everything here)
+
         }
 
     }

@@ -9,8 +9,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class SharPrefRepositoryImpl(
-    override val sharPref: SharedPreferences,
-    override val key: String
+    override val sharPref: SharedPreferences
 ) : SharPrefRepository {
 
     private var listener: OnSharedPreferenceChangeListener =
@@ -18,15 +17,19 @@ class SharPrefRepositoryImpl(
 
         }
 
+    companion object {
+        private const val KEY_FOR_ARRAY_WITH_SEARCH_HISTORY = "elems_in_search_history"
+    }
+
     override fun getArrayListFromResource(): ArrayList<Track> {
-        val json: String? = sharPref.getString(key, null)
+        val json: String? = sharPref.getString(KEY_FOR_ARRAY_WITH_SEARCH_HISTORY, null)
         val listType = object : TypeToken<ArrayList<Track>>() {}.type
         return if (json != null) Gson().fromJson(json, listType) else ArrayList()
     }
 
     override fun putArrayListInSharPref(res: ArrayList<Track>) {
         sharPref.edit {
-            putString(key, Gson().toJson(res))
+            putString(KEY_FOR_ARRAY_WITH_SEARCH_HISTORY, Gson().toJson(res))
         }
     }
 

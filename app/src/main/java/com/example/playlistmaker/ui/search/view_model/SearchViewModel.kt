@@ -1,13 +1,8 @@
 package com.example.playlistmaker.ui.search.view_model
 
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.search.SharPrefInteractor
 import com.example.playlistmaker.domain.search.TracksInteractor
 import com.example.playlistmaker.domain.search.model.SearchScreenState
@@ -20,23 +15,11 @@ class SearchViewModel(
 
     private val searchScreenStateLiveData = MutableLiveData<SearchScreenState>(SearchScreenState.Waiting(getTracksFromSharPref()))
 
-    fun getSearchScreenStateLiveData(): LiveData<SearchScreenState> = searchScreenStateLiveData
-
     companion object {
         const val MAX_COUNT_OF_TRACKS_IN_SEARCH_HISTORY = 10
-
-        fun getViewModelFactory(
-            sharPref: SharedPreferences,
-            key: String
-        ): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchViewModel(
-                    Creator.provideTracksInteractor(),
-                    Creator.provideSharPrefInteractor(sharPref, key)
-                )
-            }
-        }
     }
+
+    fun getSearchScreenStateLiveData(): LiveData<SearchScreenState> = searchScreenStateLiveData
 
     fun saveNewTrack(track: Track) {
         val tracksInSearchHistory = getTracksFromSharPref()
