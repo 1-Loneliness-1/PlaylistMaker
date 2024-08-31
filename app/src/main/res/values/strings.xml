@@ -25,4 +25,10 @@
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
     <string name="start_time">00:00</string>
+    <string name="error">Произошла ошибка!</string>
+    <string name="list_of_favorite_tracks_is_empty">Ваша медиатека пуста</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="playlists_not_created">Вы не создали\n ни одного плейлиста</string>
+    <string name="favorite_tracks">Избранные треки</string>
+    <string name="playlists">Плейлисты</string>
 </resources>
