@@ -129,7 +129,9 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        binding.ivBackToPreviousScreen.setOnClickListener { finish() }
+        binding.ivBackToPreviousScreen.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         refreshButton.setOnClickListener {
             viewModel.getTracksForList(
