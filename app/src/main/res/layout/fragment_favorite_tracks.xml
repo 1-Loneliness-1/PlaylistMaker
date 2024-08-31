@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/Theme.DayNightScreen"
+    tools:context=".ui.media.activity.FavoriteTracksFragment">
+
+    <ImageView
+        android:id="@+id/ivFavoriteTracksNotFoundPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="106dp"
+        android:contentDescription="@string/error"
+        android:src="?attr/foundNothingPlaceholder" />
+
+    <TextView
+        android:id="@+id/tvFavoriteTracksIsEmpty"
+        style="@style/PlaylistsNotFoundText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/ivFavoriteTracksNotFoundPlaceholder"
+        android:layout_marginHorizontal="@dimen/icon_size"
+        android:layout_marginTop="@dimen/padding_dimen"
+        android:text="@string/list_of_favorite_tracks_is_empty"
+        android:textFontWeight="400" />
+
+</RelativeLayout>
