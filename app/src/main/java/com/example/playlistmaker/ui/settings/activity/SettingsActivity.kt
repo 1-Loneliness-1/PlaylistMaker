@@ -43,7 +43,9 @@ class SettingsActivity : AppCompatActivity() {
             (applicationContext as App).switchTheme(checked)
         }
 
-        backToMainScreenButton.setOnClickListener { finish() }
+        backToMainScreenButton.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         shareAppButton.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)

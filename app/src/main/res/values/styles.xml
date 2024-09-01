@@ -104,6 +104,11 @@
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
 
+    <style name="PlaylistsNotFoundText" parent="ErrorTextForPlaceholder">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
+
     <style name="RefreshButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="android:background">@drawable/background_for_refresh_button</item>
         <item name="backgroundTint">@color/yp_black</item>
@@ -128,5 +133,18 @@
     <style name="PlayStopButton" parent="Widget.AppCompat.ImageButton">
         <item name="tint">@color/yp_white</item>
         <item name="backgroundTint">@color/yp_black</item>
+    </style>
+
+    <style name="MediaScreenTabs" parent="Widget.Design.TabLayout">
+        <item name="android:background">@color/yp_white</item>
+        <item name="tabIndicatorColor">@color/yp_black</item>
+    </style>
+
+    <style name="CustomTabText" parent="TextAppearance.Design.Tab">
+        <item name="tabTextColor">@color/yp_black</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="textAllCaps">false</item>
     </style>
 </resources>

@@ -89,7 +89,9 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        backToPrevScreenButton.setOnClickListener { finish() }
+        backToPrevScreenButton.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         val json: String? = intent.getStringExtra(KEY_FOR_INTENT_DATA)
         currentTrack = Gson().fromJson(json, Track::class.java)
