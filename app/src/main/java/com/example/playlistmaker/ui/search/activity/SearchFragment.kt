@@ -1,22 +1,24 @@
 package com.example.playlistmaker.ui.search.activity
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.search.model.SearchScreenState
 import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
@@ -24,10 +26,9 @@ import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
     private var isNotPressed = true
-    private var currentTextInEditText: String = ""
     private lateinit var searchEditText: EditText
     private lateinit var noResultsPlaceholder: ImageView
     private lateinit var noInternetPlaceholder: ImageView
@@ -43,13 +44,14 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var listener: () -> Unit
     private lateinit var adapter: TrackAdapter
     private lateinit var searchHistoryAdapter: TrackAdapter
-    private lateinit var binding: ActivitySearchBinding
-    private val viewModel: SearchViewModel by viewModel()
+    private lateinit var binding: FragmentSearchBinding
 
+
+    private val viewModel: SearchViewModel by viewModel()
     private val mainHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable {
         viewModel.getTracksForList(
-            currentTextInEditText,
+            searchEditText.text.toString(),
             consume = { listOfTracks ->
                 changeStateOfScreenToContent(listOfTracks)
             }
@@ -57,18 +59,17 @@ class SearchActivity : AppCompatActivity() {
     }
     private val tapEnableRunnable = Runnable { isNotPressed = true }
 
-    companion object {
-        const val TEXT_IN_SEARCH_EDIT_TEXT = "TEXT_IN_SEARCH_EDIT_TEXT"
-        private const val KEY_FOR_INTENT_DATA = "Selected track"
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val TAP_DEBOUNCE_DELAY = 1000L
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         searchEditText = binding.etSearch
         clearSearchEditTextButton = binding.ivClearEditText
@@ -89,7 +90,7 @@ class SearchActivity : AppCompatActivity() {
                 viewModel.saveNewTrack(it)
 
                 //Implementation of putting information for Player Activity by putExtra fun in Intent
-                val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+                val playerIntent = Intent(requireContext(), PlayerActivity::class.java)
                 playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
                 startActivity(playerIntent)
             }
@@ -104,14 +105,14 @@ class SearchActivity : AppCompatActivity() {
                 viewModel.setWaitingStateForScreen()
 
                 //Implementation of putting information for Player Activity by putExtra fun in Intent
-                val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+                val playerIntent = Intent(requireContext(), PlayerActivity::class.java)
                 playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
                 startActivity(playerIntent)
             }
         }
         searchHistoryRecycler.adapter = searchHistoryAdapter
 
-        viewModel.getSearchScreenStateLiveData().observe(this) { screenState ->
+        viewModel.getSearchScreenStateLiveData().observe(viewLifecycleOwner) { screenState ->
             when (screenState) {
                 is SearchScreenState.Waiting -> {
                     searchHistoryAdapter.setData(screenState.tracksInSearchHistory)
@@ -129,13 +130,9 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        binding.ivBackToPreviousScreen.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-
         refreshButton.setOnClickListener {
             viewModel.getTracksForList(
-                currentTextInEditText,
+                searchEditText.text.toString(),
                 consume = { listOfTracks ->
                     changeStateOfScreenToContent(listOfTracks)
                 }
@@ -148,7 +145,7 @@ class SearchActivity : AppCompatActivity() {
             clearSearchEditTextButton.isVisible = false
             searchEditText.clearFocus()
             val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
 
             viewModel.setWaitingStateForScreen()
@@ -158,9 +155,6 @@ class SearchActivity : AppCompatActivity() {
 
         searchEditText.doAfterTextChanged { s ->
             clearSearchEditTextButton.isVisible = s?.isNotEmpty() == true
-
-            //Saving current text in edit text in variable for putting in Instance State
-            currentTextInEditText = s.toString()
 
             if (s?.isNotEmpty() == true) {
                 searchDebounce()
@@ -192,32 +186,17 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         viewModel.registerChangeListener(listener)
     }
 
     override fun onPause() {
         super.onPause()
-
         viewModel.unregisterChangeListener()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         mainHandler.removeCallbacksAndMessages(searchRunnable)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putString(TEXT_IN_SEARCH_EDIT_TEXT, currentTextInEditText)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-        currentTextInEditText = savedInstanceState.getString(TEXT_IN_SEARCH_EDIT_TEXT).toString()
-        searchEditText.setText(currentTextInEditText)
     }
 
     private fun changeVisibilityOfElements(case: SearchScreenState) {
@@ -235,7 +214,7 @@ class SearchActivity : AppCompatActivity() {
                 noResultsPlaceholder.isVisible = false
                 refreshButton.isVisible = false
 
-                changeVisibilityOfSearchHistoryElements(currentTextInEditText.isEmpty() && searchHistoryAdapter.itemCount > 0)
+                changeVisibilityOfSearchHistoryElements(searchEditText.text.isEmpty() && searchHistoryAdapter.itemCount > 0)
             }
             is SearchScreenState.Content -> {
 
@@ -324,4 +303,11 @@ class SearchActivity : AppCompatActivity() {
     private fun changeStateOfScreenToContent(listOfTracks: List<Track>) {
         viewModel.setContentStateOfScreen(listOfTracks)
     }
+
+    companion object {
+        private const val KEY_FOR_INTENT_DATA = "Selected track"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val TAP_DEBOUNCE_DELAY = 1000L
+    }
+
 }

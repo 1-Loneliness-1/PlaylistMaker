@@ -3,36 +3,45 @@ package com.example.playlistmaker.ui.settings.activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.playlistmaker.App
 import com.example.playlistmaker.R
-import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import com.example.playlistmaker.databinding.FragmentSettingsBinding
 import com.example.playlistmaker.domain.settings.model.DarkThemeState
 import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
 
-    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var binding: FragmentSettingsBinding
 
     private val viewModel: SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        val backToMainScreenButton = binding.ivBackToMainScreen
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val shareAppButton = binding.tvShareApp
         val writeToSupportButton = binding.tvSupport
         val userAgreementButton = binding.tvUserAgreement
         val themeSwitcher = binding.sNightTheme
 
-        viewModel.getDarkThemeStateLiveData().observe(this) { darkThemeState ->
+        viewModel.getDarkThemeStateLiveData().observe(viewLifecycleOwner) { darkThemeState ->
             when (darkThemeState) {
                 is DarkThemeState.DarkTheme -> {
                     themeSwitcher.isChecked =
-                        darkThemeState.isDarkThemeOn ?: (applicationContext as App).getDarkModeState()
+                        darkThemeState.isDarkThemeOn
+                            ?: (requireActivity().applicationContext as App).getDarkModeState()
                 }
             }
         }
@@ -40,11 +49,7 @@ class SettingsActivity : AppCompatActivity() {
         viewModel.checkDarkThemeState()
 
         themeSwitcher.setOnCheckedChangeListener { _, checked ->
-            (applicationContext as App).switchTheme(checked)
-        }
-
-        backToMainScreenButton.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            (requireActivity().applicationContext as App).switchTheme(checked)
         }
 
         shareAppButton.setOnClickListener {
@@ -68,4 +73,5 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(userAgreementIntent)
         }
     }
+
 }
