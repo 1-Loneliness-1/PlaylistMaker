@@ -5,6 +5,7 @@
     <style name="Theme.DayNightScreen" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:background">@color/yp_white</item>
         <item name="colorOfRightArrow">@color/yp_text_gray</item>
+        <item name="colorOfDayNightElement">@color/yp_black</item>
         <item name="foundNothingPlaceholder">@drawable/found_nothing_placeholder</item>
         <item name="noInternetPlaceholder">@drawable/no_internet_placeholder</item>
     </style>

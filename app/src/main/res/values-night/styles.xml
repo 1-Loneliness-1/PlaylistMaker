@@ -127,4 +127,12 @@
         <item name="android:textFontWeight">500</item>
         <item name="textAllCaps">false</item>
     </style>
+
+    <style name="CustomTextAppearanceForInactiveItemInBottomNavView" parent="">
+        <item name="android:textColor">@color/yp_white</item>
+    </style>
+
+    <style name="CustomTextAppearanceForActiveItemInBottomNavView" parent="CustomTextAppearanceForInactiveItemInBottomNavView">
+        <item name="android:textColor">@color/yp_blue</item>
+    </style>
 </resources>
