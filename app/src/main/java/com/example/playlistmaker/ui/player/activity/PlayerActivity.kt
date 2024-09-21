@@ -29,44 +29,34 @@ class PlayerActivity : AppCompatActivity() {
     private val updateTextViewRunnable = object : Runnable {
         override fun run() {
             viewModel.updateCurrentPositionOfTrack()
-            mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY)
+            mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY_IN_MILLISEC)
         }
     }
     private val viewModel: PlayerViewModel by viewModel()
 
-    private lateinit var playStopButton: ImageButton
-    private lateinit var currentTrackTime: TextView
-    private lateinit var binding: ActivityPlayerBinding
-    private lateinit var currentTrack: Track
-
-    companion object {
-        private const val KEY_FOR_INTENT_DATA = "Selected track"
-        private const val CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY = 500L
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-    }
+    private var playStopButton: ImageButton? = null
+    private var currentTrackTime: TextView? = null
+    private var binding: ActivityPlayerBinding? = null
+    private var currentTrack: Track? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding?.root)
 
-        val backToPrevScreenButton = binding.ivBackToPrevScr
-        val songCover = binding.ivSongCover
-        val songTitle = binding.tvSongTitle
-        val artistName = binding.tvAuthorOfSong
-        val trackDuration = binding.tvTrackTimeChanging
-        val album = binding.tvAlbumNameChanging
-        val groupOfAlbumInfo = binding.gAlbumInfo
-        val yearOfSoundPublished = binding.tvYearOfSongChanging
-        val genreOfSong = binding.tvGenreChanging
-        val countryOfSong = binding.tvCountryOfSongChanging
+        val backToPrevScreenButton = binding?.ivBackToPrevScr
+        val songCover = binding?.ivSongCover
+        val songTitle = binding?.tvSongTitle
+        val artistName = binding?.tvAuthorOfSong
+        val trackDuration = binding?.tvTrackTimeChanging
+        val album = binding?.tvAlbumNameChanging
+        val groupOfAlbumInfo = binding?.gAlbumInfo
+        val yearOfSoundPublished = binding?.tvYearOfSongChanging
+        val genreOfSong = binding?.tvGenreChanging
+        val countryOfSong = binding?.tvCountryOfSongChanging
 
-        //Initialize variables of class
-        playStopButton = binding.ibPlayStop
-        currentTrackTime = binding.tvCurrentTrackTime
+        playStopButton = binding?.ibPlayStop
+        currentTrackTime = binding?.tvCurrentTrackTime
 
         viewModel.getPlayerStatusLiveData().observe(this) { playerState ->
             when (playerState) {
@@ -80,7 +70,7 @@ class PlayerActivity : AppCompatActivity() {
 
                 is PlayerState.PlayingState -> {
                     changeStateOfElements(STATE_PLAYING)
-                    currentTrackTime.text = playerState.currentPosition
+                    currentTrackTime?.text = playerState.currentPosition
                 }
 
                 is PlayerState.PausedState -> {
@@ -89,7 +79,7 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        backToPrevScreenButton.setOnClickListener {
+        backToPrevScreenButton?.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
@@ -97,26 +87,26 @@ class PlayerActivity : AppCompatActivity() {
         currentTrack = Gson().fromJson(json, Track::class.java)
         if (json != null) {
             Glide.with(this)
-                .load(currentTrack.artworkUrl100.replace("100x100bb.jpg", "512x512bb.jpg"))
+                .load(currentTrack?.artworkUrl100?.replace("100x100bb.jpg", "512x512bb.jpg"))
                 .placeholder(R.drawable.song_cover_placeholder)
                 .centerCrop()
                 .transform(RoundedCorners(DimenConvertor.dpToPx(8f, this)))
-                .into(songCover)
-            songTitle.text = currentTrack.trackName
-            artistName.text = currentTrack.artistName
-            trackDuration.text = currentTrack.trackTimeMillis
-            groupOfAlbumInfo.isVisible = currentTrack.collectionName != null
-            album.text = currentTrack.collectionName
-            yearOfSoundPublished.text = currentTrack.releaseDate.split("-")[0]
-            genreOfSong.text = currentTrack.primaryGenreName
-            countryOfSong.text = currentTrack.country
+                .into(songCover!!)
+            songTitle?.text = currentTrack?.trackName
+            artistName?.text = currentTrack?.artistName
+            trackDuration?.text = currentTrack?.trackTimeMillis
+            groupOfAlbumInfo?.isVisible = currentTrack?.collectionName != null
+            album?.text = currentTrack?.collectionName
+            yearOfSoundPublished?.text = currentTrack?.releaseDate?.split("-")?.get(0)
+            genreOfSong?.text = currentTrack?.primaryGenreName
+            countryOfSong?.text = currentTrack?.country
         } else {
             Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_SHORT).show()
         }
 
-        viewModel.preparePlayer(currentTrack.previewUrl, consume)
+        viewModel.preparePlayer(currentTrack?.previewUrl!!, consume)
 
-        playStopButton.setOnClickListener {
+        playStopButton?.setOnClickListener {
             when (viewModel.getPlayerStatusLiveData().value) {
                 is PlayerState.PreparedState, PlayerState.PausedState -> {
                     viewModel.startPlayer()
@@ -128,7 +118,7 @@ class PlayerActivity : AppCompatActivity() {
                 }
 
                 else -> {
-                    //Nothing to do))
+
                 }
             }
         }
@@ -150,27 +140,36 @@ class PlayerActivity : AppCompatActivity() {
     private fun changeStateOfElements(currentState: Int) {
         when (currentState) {
             STATE_DEFAULT -> {
-                playStopButton.isClickable = false
-                playStopButton.alpha = 0.5f
+                playStopButton?.isClickable = false
+                playStopButton?.alpha = 0.5f
             }
 
             STATE_PREPARED -> {
                 mainHandler.removeCallbacksAndMessages(null)
-                playStopButton.isClickable = true
-                playStopButton.alpha = 1.0f
-                playStopButton.setImageResource(R.drawable.play_icon)
-                currentTrackTime.text = resources.getString(R.string.start_time)
+                playStopButton?.isClickable = true
+                playStopButton?.alpha = 1.0f
+                playStopButton?.setImageResource(R.drawable.play_icon)
+                currentTrackTime?.text = resources.getString(R.string.start_time)
             }
 
             STATE_PLAYING -> {
-                playStopButton.setImageResource(R.drawable.pause_icon)
+                playStopButton?.setImageResource(R.drawable.pause_icon)
                 mainHandler.post(updateTextViewRunnable)
             }
 
             STATE_PAUSED -> {
-                playStopButton.setImageResource(R.drawable.play_icon)
+                playStopButton?.setImageResource(R.drawable.play_icon)
             }
         }
+    }
+
+    companion object {
+        private const val KEY_FOR_INTENT_DATA = "Selected track"
+        private const val CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY_IN_MILLISEC = 500L
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
     }
 
 }

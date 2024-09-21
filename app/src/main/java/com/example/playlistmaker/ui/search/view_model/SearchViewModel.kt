@@ -15,10 +15,6 @@ class SearchViewModel(
 
     private val searchScreenStateLiveData = MutableLiveData<SearchScreenState>(SearchScreenState.Waiting(getTracksFromSharPref()))
 
-    companion object {
-        const val MAX_COUNT_OF_TRACKS_IN_SEARCH_HISTORY = 10
-    }
-
     fun getSearchScreenStateLiveData(): LiveData<SearchScreenState> = searchScreenStateLiveData
 
     fun saveNewTrack(track: Track) {
@@ -59,4 +55,9 @@ class SearchViewModel(
 
     fun unregisterChangeListener() =
         sharPrefInteractor.unregisterChangeListener()
+
+    companion object {
+        const val MAX_COUNT_OF_TRACKS_IN_SEARCH_HISTORY = 10
+    }
+
 }

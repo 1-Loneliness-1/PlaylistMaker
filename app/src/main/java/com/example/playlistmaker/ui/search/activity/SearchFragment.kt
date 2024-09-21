@@ -29,29 +29,29 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class SearchFragment : Fragment() {
 
     private var isNotPressed = true
-    private lateinit var searchEditText: EditText
-    private lateinit var noResultsPlaceholder: ImageView
-    private lateinit var noInternetPlaceholder: ImageView
-    private lateinit var errorNothingFoundText: TextView
-    private lateinit var errorNoInternetText: TextView
-    private lateinit var refreshButton: Button
-    private lateinit var clearSearchEditTextButton: ImageView
-    private lateinit var searchTracksRecycler: RecyclerView
-    private lateinit var searchHistoryRecycler: RecyclerView
-    private lateinit var clearHistoryButton: Button
-    private lateinit var youLookedForText: TextView
-    private lateinit var progressBarTrackListLoading: ProgressBar
-    private lateinit var listener: () -> Unit
-    private lateinit var adapter: TrackAdapter
-    private lateinit var searchHistoryAdapter: TrackAdapter
-    private lateinit var binding: FragmentSearchBinding
+    private var searchEditText: EditText? = null
+    private var noResultsPlaceholder: ImageView? = null
+    private var noInternetPlaceholder: ImageView? = null
+    private var errorNothingFoundText: TextView? = null
+    private var errorNoInternetText: TextView? = null
+    private var refreshButton: Button? = null
+    private var clearSearchEditTextButton: ImageView? = null
+    private var searchTracksRecycler: RecyclerView? = null
+    private var searchHistoryRecycler: RecyclerView? = null
+    private var clearHistoryButton: Button? = null
+    private var youLookedForText: TextView? = null
+    private var progressBarTrackListLoading: ProgressBar? = null
+    private var listener: () -> Unit = {}
+    private var adapter: TrackAdapter? = null
+    private var searchHistoryAdapter: TrackAdapter? = null
+    private var binding: FragmentSearchBinding? = null
 
 
     private val viewModel: SearchViewModel by viewModel()
     private val mainHandler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable {
         viewModel.getTracksForList(
-            searchEditText.text.toString(),
+            searchEditText?.text.toString(),
             consume = { listOfTracks ->
                 changeStateOfScreenToContent(listOfTracks)
             }
@@ -63,59 +63,56 @@ class SearchFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding.root
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchEditText = binding.etSearch
-        clearSearchEditTextButton = binding.ivClearEditText
-        searchTracksRecycler = binding.rvTrackSearchList
-        searchHistoryRecycler = binding.rvSearchHistory
-        noResultsPlaceholder = binding.ivNothingFoundPlaceholder
-        noInternetPlaceholder = binding.ivNoInternetPlaceholder
-        errorNothingFoundText = binding.tvErrorNothingFound
-        errorNoInternetText = binding.tvErrorNoInternet
-        refreshButton = binding.bRefreshRequest
-        clearHistoryButton = binding.bClearSearchHistory
-        youLookedForText = binding.tvYouLookedFor
-        progressBarTrackListLoading = binding.pbListOfTracksLoading
+        searchEditText = binding?.etSearch
+        clearSearchEditTextButton = binding?.ivClearEditText
+        searchTracksRecycler = binding?.rvTrackSearchList
+        searchHistoryRecycler = binding?.rvSearchHistory
+        noResultsPlaceholder = binding?.ivNothingFoundPlaceholder
+        noInternetPlaceholder = binding?.ivNoInternetPlaceholder
+        errorNothingFoundText = binding?.tvErrorNothingFound
+        errorNoInternetText = binding?.tvErrorNoInternet
+        refreshButton = binding?.bRefreshRequest
+        clearHistoryButton = binding?.bClearSearchHistory
+        youLookedForText = binding?.tvYouLookedFor
+        progressBarTrackListLoading = binding?.pbListOfTracksLoading
 
         adapter = TrackAdapter {
             if (isNotPressed) {
                 tapDebounce()
                 viewModel.saveNewTrack(it)
 
-                //Implementation of putting information for Player Activity by putExtra fun in Intent
                 val playerIntent = Intent(requireContext(), PlayerActivity::class.java)
                 playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
                 startActivity(playerIntent)
             }
         }
-        searchTracksRecycler.adapter = adapter
+        searchTracksRecycler?.adapter = adapter
 
-        //Setting adapter for search history list
         searchHistoryAdapter = TrackAdapter {
             if (isNotPressed) {
                 tapDebounce()
                 viewModel.saveNewTrack(it)
                 viewModel.setWaitingStateForScreen()
 
-                //Implementation of putting information for Player Activity by putExtra fun in Intent
                 val playerIntent = Intent(requireContext(), PlayerActivity::class.java)
                 playerIntent.putExtra(KEY_FOR_INTENT_DATA, Gson().toJson(it))
                 startActivity(playerIntent)
             }
         }
-        searchHistoryRecycler.adapter = searchHistoryAdapter
+        searchHistoryRecycler?.adapter = searchHistoryAdapter
 
         viewModel.getSearchScreenStateLiveData().observe(viewLifecycleOwner) { screenState ->
             when (screenState) {
                 is SearchScreenState.Waiting -> {
-                    searchHistoryAdapter.setData(screenState.tracksInSearchHistory)
+                    searchHistoryAdapter?.setData(screenState.tracksInSearchHistory)
                     changeVisibilityOfElements(screenState)
                 }
                 is SearchScreenState.Loading -> {
@@ -124,37 +121,37 @@ class SearchFragment : Fragment() {
                 is SearchScreenState.Content -> {
                     changeVisibilityOfElements(screenState)
                     if (screenState.listOfFoundedTracks.isNotEmpty() && screenState.listOfFoundedTracks[0].trackId.toInt() != -1) {
-                        adapter.setData(screenState.listOfFoundedTracks)
+                        adapter?.setData(screenState.listOfFoundedTracks)
                     }
                 }
             }
         }
 
-        refreshButton.setOnClickListener {
+        refreshButton?.setOnClickListener {
             viewModel.getTracksForList(
-                searchEditText.text.toString(),
+                searchEditText?.text.toString(),
                 consume = { listOfTracks ->
                     changeStateOfScreenToContent(listOfTracks)
                 }
             )
         }
 
-        clearSearchEditTextButton.setOnClickListener {
+        clearSearchEditTextButton?.setOnClickListener {
             mainHandler.removeCallbacksAndMessages(searchRunnable)
-            searchEditText.setText("")
-            clearSearchEditTextButton.isVisible = false
-            searchEditText.clearFocus()
+            searchEditText?.setText("")
+            clearSearchEditTextButton?.isVisible = false
+            searchEditText?.clearFocus()
             val inputMethodManager =
                 requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
 
             viewModel.setWaitingStateForScreen()
 
-            adapter.removeAllData()
+            adapter?.removeAllData()
         }
 
-        searchEditText.doAfterTextChanged { s ->
-            clearSearchEditTextButton.isVisible = s?.isNotEmpty() == true
+        searchEditText?.doAfterTextChanged { s ->
+            clearSearchEditTextButton?.isVisible = s?.isNotEmpty() == true
 
             if (s?.isNotEmpty() == true) {
                 searchDebounce()
@@ -163,21 +160,19 @@ class SearchFragment : Fragment() {
                 viewModel.setWaitingStateForScreen()
             }
         }
-        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+        searchEditText?.setOnFocusChangeListener { _, hasFocus ->
             val conditionOfSearchEditText = hasFocus &&
-                    searchEditText.text?.isEmpty() == true &&
-                    searchHistoryAdapter.itemCount > 0
+                    searchEditText?.text?.isEmpty() == true &&
+                    searchHistoryAdapter?.itemCount!! > 0
             changeVisibilityOfSearchHistoryElements(conditionOfSearchEditText)
         }
 
-        //Implementation of on click listener for clear search history button
-        clearHistoryButton.setOnClickListener {
+        clearHistoryButton?.setOnClickListener {
             viewModel.removeAllTracks()
-            searchHistoryAdapter.removeAllData()
+            searchHistoryAdapter?.removeAllData()
             changeVisibilityOfSearchHistoryElements(false)
         }
 
-        //Implementation of change listener for instance of shared preferences
         listener = {
 
         }
@@ -203,101 +198,99 @@ class SearchFragment : Fragment() {
 
         when (case) {
             is SearchScreenState.Waiting -> {
-                progressBarTrackListLoading.isVisible = false
-                searchTracksRecycler.isVisible = false
+                progressBarTrackListLoading?.isVisible = false
+                searchTracksRecycler?.isVisible = false
 
                 changeParamsOfSearchEditText(true)
 
-                errorNoInternetText.isVisible = false
-                errorNothingFoundText.isVisible = false
-                noInternetPlaceholder.isVisible = false
-                noResultsPlaceholder.isVisible = false
-                refreshButton.isVisible = false
+                errorNoInternetText?.isVisible = false
+                errorNothingFoundText?.isVisible = false
+                noInternetPlaceholder?.isVisible = false
+                noResultsPlaceholder?.isVisible = false
+                refreshButton?.isVisible = false
 
-                changeVisibilityOfSearchHistoryElements(searchEditText.text.isEmpty() && searchHistoryAdapter.itemCount > 0)
+                changeVisibilityOfSearchHistoryElements(searchEditText?.text?.isEmpty() == true && searchHistoryAdapter?.itemCount!! > 0)
             }
             is SearchScreenState.Content -> {
 
                 if (case.listOfFoundedTracks.isEmpty()) {
-                    progressBarTrackListLoading.isVisible = false
-                    searchTracksRecycler.isVisible = false
+                    progressBarTrackListLoading?.isVisible = false
+                    searchTracksRecycler?.isVisible = false
 
                     changeParamsOfSearchEditText(true)
 
-                    errorNoInternetText.isVisible = false
-                    noInternetPlaceholder.isVisible = false
-                    refreshButton.isVisible = false
+                    errorNoInternetText?.isVisible = false
+                    noInternetPlaceholder?.isVisible = false
+                    refreshButton?.isVisible = false
 
                     changeVisibilityOfSearchHistoryElements(false)
                 } else if ((case.listOfFoundedTracks[0].trackId.toInt() == -1)) {
-                    progressBarTrackListLoading.isVisible = false
-                    searchTracksRecycler.isVisible = false
+                    progressBarTrackListLoading?.isVisible = false
+                    searchTracksRecycler?.isVisible = false
 
                     changeParamsOfSearchEditText(false)
 
-                    errorNoInternetText.isVisible = true
-                    errorNothingFoundText.isVisible = false
-                    noInternetPlaceholder.isVisible = true
-                    noResultsPlaceholder.isVisible = false
-                    refreshButton.isVisible = true
+                    errorNoInternetText?.isVisible = true
+                    errorNothingFoundText?.isVisible = false
+                    noInternetPlaceholder?.isVisible = true
+                    noResultsPlaceholder?.isVisible = false
+                    refreshButton?.isVisible = true
 
                     changeVisibilityOfSearchHistoryElements(false)
                 } else {
-                    progressBarTrackListLoading.isVisible = false
-                    searchTracksRecycler.isVisible = true
+                    progressBarTrackListLoading?.isVisible = false
+                    searchTracksRecycler?.isVisible = true
 
                     changeParamsOfSearchEditText(true)
 
-                    errorNoInternetText.isVisible = false
-                    errorNothingFoundText.isVisible = false
-                    noInternetPlaceholder.isVisible = false
-                    noResultsPlaceholder.isVisible = false
-                    refreshButton.isVisible = false
+                    errorNoInternetText?.isVisible = false
+                    errorNothingFoundText?.isVisible = false
+                    noInternetPlaceholder?.isVisible = false
+                    noResultsPlaceholder?.isVisible = false
+                    refreshButton?.isVisible = false
 
                     changeVisibilityOfSearchHistoryElements(false)
                 }
 
             }
             is SearchScreenState.Loading -> {
-                progressBarTrackListLoading.isVisible = true
-                searchTracksRecycler.isVisible = false
+                progressBarTrackListLoading?.isVisible = true
+                searchTracksRecycler?.isVisible = false
 
                 changeParamsOfSearchEditText(true)
 
-                errorNoInternetText.isVisible = false
-                errorNothingFoundText.isVisible = false
-                noInternetPlaceholder.isVisible = false
-                noResultsPlaceholder.isVisible = false
-                refreshButton.isVisible = false
+                errorNoInternetText?.isVisible = false
+                errorNothingFoundText?.isVisible = false
+                noInternetPlaceholder?.isVisible = false
+                noResultsPlaceholder?.isVisible = false
+                refreshButton?.isVisible = false
 
                 changeVisibilityOfSearchHistoryElements(false)
             }
         }
     }
 
-    //Function for changing visibility of all elements for displaying search history:
-    //text "You looked", recycler view and button "Clear history"
     private fun changeVisibilityOfSearchHistoryElements(visible: Boolean) {
-        clearHistoryButton.isVisible = visible
-        searchHistoryRecycler.isVisible = visible
-        youLookedForText.isVisible = visible
+        clearHistoryButton?.isVisible = visible
+        searchHistoryRecycler?.isVisible = visible
+        youLookedForText?.isVisible = visible
     }
 
     private fun changeParamsOfSearchEditText(isEditTextAvailable: Boolean) {
-        searchEditText.isFocusableInTouchMode = isEditTextAvailable
-        clearSearchEditTextButton.isEnabled = isEditTextAvailable
-        clearSearchEditTextButton.isClickable = isEditTextAvailable
+        searchEditText?.isFocusableInTouchMode = isEditTextAvailable
+        clearSearchEditTextButton?.isEnabled = isEditTextAvailable
+        clearSearchEditTextButton?.isClickable = isEditTextAvailable
     }
 
     private fun searchDebounce() {
         mainHandler.removeCallbacksAndMessages(null)
-        if (searchEditText.text?.isNotEmpty() == true)
-            mainHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+        if (searchEditText?.text?.isNotEmpty() == true)
+            mainHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_IN_MILLISEC)
     }
 
     private fun tapDebounce() {
         isNotPressed = false
-        mainHandler.postDelayed(tapEnableRunnable, TAP_DEBOUNCE_DELAY)
+        mainHandler.postDelayed(tapEnableRunnable, TAP_DEBOUNCE_DELAY_IN_MILLISEC)
     }
 
     private fun changeStateOfScreenToContent(listOfTracks: List<Track>) {
@@ -306,8 +299,8 @@ class SearchFragment : Fragment() {
 
     companion object {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val TAP_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY_IN_MILLISEC = 2000L
+        private const val TAP_DEBOUNCE_DELAY_IN_MILLISEC = 1000L
     }
 
 }

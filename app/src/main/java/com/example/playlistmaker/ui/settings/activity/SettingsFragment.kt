@@ -16,30 +16,30 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : Fragment() {
 
-    private lateinit var binding: FragmentSettingsBinding
+    private var binding: FragmentSettingsBinding? = null
 
     private val viewModel: SettingsViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        return binding.root
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val shareAppButton = binding.tvShareApp
-        val writeToSupportButton = binding.tvSupport
-        val userAgreementButton = binding.tvUserAgreement
-        val themeSwitcher = binding.sNightTheme
+        val shareAppButton = binding?.tvShareApp
+        val writeToSupportButton = binding?.tvSupport
+        val userAgreementButton = binding?.tvUserAgreement
+        val themeSwitcher = binding?.sNightTheme
 
         viewModel.getDarkThemeStateLiveData().observe(viewLifecycleOwner) { darkThemeState ->
             when (darkThemeState) {
                 is DarkThemeState.DarkTheme -> {
-                    themeSwitcher.isChecked =
+                    themeSwitcher?.isChecked =
                         darkThemeState.isDarkThemeOn
                             ?: (requireActivity().applicationContext as App).getDarkModeState()
                 }
@@ -48,18 +48,18 @@ class SettingsFragment : Fragment() {
 
         viewModel.checkDarkThemeState()
 
-        themeSwitcher.setOnCheckedChangeListener { _, checked ->
+        themeSwitcher?.setOnCheckedChangeListener { _, checked ->
             (requireActivity().applicationContext as App).switchTheme(checked)
         }
 
-        shareAppButton.setOnClickListener {
+        shareAppButton?.setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.setType("text/plain")
                 .putExtra(Intent.EXTRA_TEXT, getString(R.string.yp_android_course_link))
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_apk_text)))
         }
 
-        writeToSupportButton.setOnClickListener {
+        writeToSupportButton?.setOnClickListener {
             val writeToSupportIntent = Intent(Intent.ACTION_SEND)
             writeToSupportIntent.setType("message/rfc822")
                 .putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.my_email)) )
@@ -68,7 +68,7 @@ class SettingsFragment : Fragment() {
             startActivity(Intent.createChooser(writeToSupportIntent, getString(R.string.write_to_support)))
         }
 
-        userAgreementButton.setOnClickListener {
+        userAgreementButton?.setOnClickListener {
             val userAgreementIntent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.yp_offertory_link)))
             startActivity(userAgreementIntent)
         }
