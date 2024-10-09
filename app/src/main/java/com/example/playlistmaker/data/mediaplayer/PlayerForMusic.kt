@@ -30,7 +30,10 @@ class PlayerForMusic(
             Locale.getDefault()
         ).format(mediaPlayer.currentPosition)
 
-    override fun releaseResourcesForPlayer() = mediaPlayer.release()
+    override fun releaseResourcesForPlayer() {
+        mediaPlayer.stop()
+        mediaPlayer.release()
+    }
 
     override fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit) {
         mediaPlayer.setDataSource(urlOfMusic)
@@ -42,4 +45,7 @@ class PlayerForMusic(
             consume(STATE_PREPARED)
         }
     }
+
+    override fun isPlaying(): Boolean =
+        mediaPlayer.isPlaying
 }

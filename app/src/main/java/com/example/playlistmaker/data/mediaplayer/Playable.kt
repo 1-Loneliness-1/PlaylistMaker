@@ -17,4 +17,6 @@ interface Playable {
 
     fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit)
 
+    fun isPlaying(): Boolean
+
 }

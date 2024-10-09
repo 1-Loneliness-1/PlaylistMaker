@@ -7,4 +7,5 @@ interface PlayerInteractor {
     fun getCurrentPosition(): String
     fun releaseResourcesForPlayer()
     fun prepPlayer(urlOfMusic: String, consume: (Int) -> Unit)
+    fun isPlaying(): Boolean
 }
