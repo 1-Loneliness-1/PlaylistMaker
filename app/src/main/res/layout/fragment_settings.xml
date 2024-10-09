@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.settings.activity.SettingsFragment"
     android:theme="@style/Theme.DayNightScreen">
-
-    <ImageView
-        android:id="@+id/ivBackToMainScreen"
-        style="@style/BackArrow"
-        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/tvSettingsHeader"
         style="@style/Header"
-        android:layout_alignTop="@+id/ivBackToMainScreen"
-        android:layout_alignBottom="@+id/ivBackToMainScreen"
-        android:layout_toEndOf="@+id/ivBackToMainScreen"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginTop="@dimen/padding_dimen"
         android:text="@string/settings" />
 
     <Switch

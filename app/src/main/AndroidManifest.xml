@@ -19,16 +19,8 @@
             android:name=".ui.player.activity.PlayerActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.search.activity.SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.media.activity.MediaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.settings.activity.SettingsActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.main.activity.MainActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

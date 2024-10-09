@@ -147,4 +147,16 @@
         <item name="android:textFontWeight">500</item>
         <item name="textAllCaps">false</item>
     </style>
+
+    <style name="CustomTextAppearanceForInactiveItemInBottomNavView" parent="">
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/bottom_menu_text_size</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:lineHeight">@dimen/padding_dimen</item>
+        <item name="android:textColor">@color/yp_black</item>
+    </style>
+
+    <style name="CustomTextAppearanceForActiveItemInBottomNavView" parent="CustomTextAppearanceForInactiveItemInBottomNavView">
+        <item name="android:textColor">@color/yp_blue</item>
+    </style>
 </resources>

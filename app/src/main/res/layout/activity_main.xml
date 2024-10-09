@@ -1,49 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/padding_dimen"
-    android:paddingHorizontal="@dimen/padding_dimen"
-    android:theme="@style/Theme.MainScreen">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.main.activity.MainActivity"
+    android:theme="@style/Theme.DayNightScreen">
 
-    <TextView
-        style="@style/Header"
-        android:layout_marginStart="@dimen/zero_dimen"
-        android:layout_marginTop="14dp"
-        android:text="@string/app_name_capitalize"
-        android:textColor="@color/yp_white" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fcvHostActivity"
+        android:layout_width="@dimen/zero_dimen"
+        android:layout_height="@dimen/zero_dimen"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bnvOnHostActivity"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/main_nav_graph"
+        app:defaultNavHost="true" />
 
-    <LinearLayout
-        android:id="@+id/llMainButtons"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="12dp"
-        android:orientation="vertical">
+        android:layout_height="0.5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bnvOnHostActivity"
+        android:background="@color/yp_light_gray" />
 
-        <Button
-            android:id="@+id/bSearch"
-            style="@style/MainScreenButton"
-            android:layout_marginBottom="@dimen/padding_dimen"
-            android:text="@string/search"
-            app:icon="@drawable/search" />
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bnvOnHostActivity"
+        android:layout_width="@dimen/zero_dimen"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_menu_on_host_activity"
+        app:itemIconTint="@drawable/bottom_nav_view_custom_color"
+        app:itemTextColor="@drawable/bottom_nav_view_custom_color"
+        app:itemTextAppearanceActive="@style/CustomTextAppearanceForActiveItemInBottomNavView"
+        app:itemTextAppearanceInactive="@style/CustomTextAppearanceForInactiveItemInBottomNavView" />
 
-        <Button
-            android:id="@+id/bMedia"
-            style="@style/MainScreenButton"
-            android:layout_marginBottom="@dimen/padding_dimen"
-            android:text="@string/media"
-            app:icon="@drawable/media" />
-
-        <Button
-            android:id="@+id/bSettings"
-            style="@style/MainScreenButton"
-            android:text="@string/settings"
-            app:icon="@drawable/settings" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,19 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     style="@style/Theme.DayNightScreen"
-    tools:context=".ui.media.activity.MediaActivity">
-
-    <ImageView
-        android:id="@+id/ivBackToPrevScreen"
-        style="@style/BackArrow"
-        tools:ignore="ContentDescription" />
+    tools:context=".ui.media.activity.MediaFragment">
 
     <TextView
         android:id="@+id/tvMediaHeader"
         style="@style/Header"
-        android:layout_alignTop="@id/ivBackToPrevScreen"
-        android:layout_alignBottom="@id/ivBackToPrevScreen"
-        android:layout_toEndOf="@id/ivBackToPrevScreen"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginTop="@dimen/padding_dimen"
         android:text="@string/media" />
 
     <com.google.android.material.tabs.TabLayout
@@ -26,7 +22,7 @@
         style="@style/MediaScreenTabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ivBackToPrevScreen"
+        android:layout_below="@id/tvMediaHeader"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="32dp"
