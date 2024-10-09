@@ -3,10 +3,12 @@ package com.example.playlistmaker.ui.search.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.search.SharPrefInteractor
 import com.example.playlistmaker.domain.search.TracksInteractor
 import com.example.playlistmaker.domain.search.model.SearchScreenState
 import com.example.playlistmaker.domain.search.model.Track
+import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val tracksInteractor: TracksInteractor,
@@ -37,17 +39,21 @@ class SearchViewModel(
         sharPrefInteractor.removeAllRes()
     }
 
-    fun getTracksForList(exp: String, consume: (List<Track>) -> Unit) {
-        searchScreenStateLiveData.postValue(SearchScreenState.Loading)
-        tracksInteractor.searchTracks(exp, consume)
+    fun getTracksForList(exp: String) {
+        if (exp.isNotEmpty()) {
+            searchScreenStateLiveData.postValue(SearchScreenState.Loading)
+            viewModelScope.launch {
+                tracksInteractor
+                    .searchTracks(exp)
+                    .collect { listOfTracks ->
+                        searchScreenStateLiveData.postValue(SearchScreenState.Content(listOfTracks))
+                    }
+            }
+        }
     }
 
     fun setWaitingStateForScreen() {
         searchScreenStateLiveData.postValue(SearchScreenState.Waiting(getTracksFromSharPref()))
-    }
-
-    fun setContentStateOfScreen(listOfTracks: List<Track>) {
-        searchScreenStateLiveData.postValue(SearchScreenState.Content(listOfTracks))
     }
 
     fun registerChangeListener(listener: () -> Unit) =
