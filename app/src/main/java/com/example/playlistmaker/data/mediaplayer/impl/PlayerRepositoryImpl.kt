@@ -22,4 +22,7 @@ class PlayerRepositoryImpl(
     override fun preparePlayer(urlOfMusic: String, consume: (Int) -> Unit) =
         mediaPlayer.preparePlayer(urlOfMusic, consume)
 
+    override fun isPlaying(): Boolean =
+        mediaPlayer.isPlaying()
+
 }

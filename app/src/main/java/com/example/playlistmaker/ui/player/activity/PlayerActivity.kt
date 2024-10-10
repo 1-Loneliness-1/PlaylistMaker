@@ -1,8 +1,6 @@
 package com.example.playlistmaker.ui.player.activity
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -21,16 +19,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
 
-    private val mainHandler = Handler(Looper.getMainLooper())
     private val consume: (Int) -> Unit = { _ ->
-        mainHandler.removeCallbacksAndMessages(null)
         viewModel.setPrepState()
-    }
-    private val updateTextViewRunnable = object : Runnable {
-        override fun run() {
-            viewModel.updateCurrentPositionOfTrack()
-            mainHandler.postDelayed(this, CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY_IN_MILLISEC)
-        }
     }
     private val viewModel: PlayerViewModel by viewModel()
 
@@ -59,23 +49,9 @@ class PlayerActivity : AppCompatActivity() {
         currentTrackTime = binding?.tvCurrentTrackTime
 
         viewModel.getPlayerStatusLiveData().observe(this) { playerState ->
-            when (playerState) {
-                is PlayerState.DefaultState -> {
-                    changeStateOfElements(STATE_DEFAULT)
-                }
-
-                is PlayerState.PreparedState -> {
-                    changeStateOfElements(STATE_PREPARED)
-                }
-
-                is PlayerState.PlayingState -> {
-                    changeStateOfElements(STATE_PLAYING)
-                    currentTrackTime?.text = playerState.currentPosition
-                }
-
-                is PlayerState.PausedState -> {
-                    changeStateOfElements(STATE_PAUSED)
-                }
+            changeStateOfElements(playerState)
+            if (playerState is PlayerState.PlayingState) {
+                currentTrackTime?.text = playerState.currentPosition
             }
         }
 
@@ -111,12 +87,9 @@ class PlayerActivity : AppCompatActivity() {
                 is PlayerState.PreparedState, PlayerState.PausedState -> {
                     viewModel.startPlayer()
                 }
-
                 is PlayerState.PlayingState -> {
-                    mainHandler.removeCallbacksAndMessages(null)
                     viewModel.pausePlayer()
                 }
-
                 else -> {
 
                 }
@@ -132,32 +105,28 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        mainHandler.removeCallbacksAndMessages(null)
         viewModel.releasePlayer()
     }
 
-    // Fun for changing state of elements on the screen by current state of player
-    private fun changeStateOfElements(currentState: Int) {
+    private fun changeStateOfElements(currentState: PlayerState) {
         when (currentState) {
-            STATE_DEFAULT -> {
+            is PlayerState.DefaultState -> {
                 playStopButton?.isClickable = false
                 playStopButton?.alpha = 0.5f
             }
 
-            STATE_PREPARED -> {
-                mainHandler.removeCallbacksAndMessages(null)
+            is PlayerState.PreparedState -> {
                 playStopButton?.isClickable = true
                 playStopButton?.alpha = 1.0f
                 playStopButton?.setImageResource(R.drawable.play_icon)
                 currentTrackTime?.text = resources.getString(R.string.start_time)
             }
 
-            STATE_PLAYING -> {
+            is PlayerState.PlayingState -> {
                 playStopButton?.setImageResource(R.drawable.pause_icon)
-                mainHandler.post(updateTextViewRunnable)
             }
 
-            STATE_PAUSED -> {
+            is PlayerState.PausedState -> {
                 playStopButton?.setImageResource(R.drawable.play_icon)
             }
         }
@@ -165,11 +134,6 @@ class PlayerActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
-        private const val CURRENT_COUNT_OF_SECONDS_UPDATE_DELAY_IN_MILLISEC = 500L
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
     }
 
 }

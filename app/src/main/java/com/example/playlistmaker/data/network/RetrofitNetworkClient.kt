@@ -3,9 +3,8 @@ package com.example.playlistmaker.data.network
 import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.dto.Response
 import com.example.playlistmaker.data.dto.TracksSearchRequest
-import com.example.playlistmaker.data.dto.TracksSearchResponse
-import retrofit2.Call
-import retrofit2.Callback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -22,34 +21,20 @@ class RetrofitNetworkClient : NetworkClient {
 
     private val itunesService = retrofit.create(ItunesApiService::class.java)
 
-    override fun doRequest(dto: Any, consume: (Response) -> Unit) {
-        when (dto) {
+    override suspend fun doRequest(dto: Any): Response {
+        return when (dto) {
             is TracksSearchRequest -> {
-                itunesService.search(dto.searchExpression)
-                    .enqueue(object : Callback<TracksSearchResponse> {
-                        override fun onResponse(
-                            call: Call<TracksSearchResponse>,
-                            response: retrofit2.Response<TracksSearchResponse>
-                        ) {
-                            if (response.code() == 200) {
-                                consume(
-                                    response.body()!!.apply { resultCode = response.code() }
-                                )
-                            } else {
-                                consume(
-                                    Response().apply { resultCode = response.code() }
-                                )
-                            }
-                        }
-
-                        override fun onFailure(p0: Call<TracksSearchResponse>, p1: Throwable) {
-                            consume(Response())
-                        }
-
-                    })
+                withContext(Dispatchers.IO) {
+                    try {
+                        itunesService.search(dto.searchExpression).apply { resultCode = 200 }
+                    } catch (e: Throwable) {
+                        Response().apply { resultCode = 500 }
+                    }
+                }
             }
+
             else -> {
-                consume(Response().apply { resultCode = 400 })
+                Response().apply { resultCode = 400 }
             }
         }
     }

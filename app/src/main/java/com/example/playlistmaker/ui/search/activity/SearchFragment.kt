@@ -3,8 +3,6 @@ package com.example.playlistmaker.ui.search.activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,13 +15,16 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.search.model.SearchScreenState
-import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.google.gson.Gson
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -45,19 +46,11 @@ class SearchFragment : Fragment() {
     private var adapter: TrackAdapter? = null
     private var searchHistoryAdapter: TrackAdapter? = null
     private var binding: FragmentSearchBinding? = null
+    private var searchJob: Job? = null
+    private var previousTextInEditText: String = ""
 
 
     private val viewModel: SearchViewModel by viewModel()
-    private val mainHandler = Handler(Looper.getMainLooper())
-    private val searchRunnable = Runnable {
-        viewModel.getTracksForList(
-            searchEditText?.text.toString(),
-            consume = { listOfTracks ->
-                changeStateOfScreenToContent(listOfTracks)
-            }
-        )
-    }
-    private val tapEnableRunnable = Runnable { isNotPressed = true }
 
 
     override fun onCreateView(
@@ -70,7 +63,6 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         searchEditText = binding?.etSearch
         clearSearchEditTextButton = binding?.ivClearEditText
         searchTracksRecycler = binding?.rvTrackSearchList
@@ -128,16 +120,11 @@ class SearchFragment : Fragment() {
         }
 
         refreshButton?.setOnClickListener {
-            viewModel.getTracksForList(
-                searchEditText?.text.toString(),
-                consume = { listOfTracks ->
-                    changeStateOfScreenToContent(listOfTracks)
-                }
-            )
+            viewModel.getTracksForList(searchEditText?.text.toString())
         }
 
         clearSearchEditTextButton?.setOnClickListener {
-            mainHandler.removeCallbacksAndMessages(searchRunnable)
+            searchJob?.cancel()
             searchEditText?.setText("")
             clearSearchEditTextButton?.isVisible = false
             searchEditText?.clearFocus()
@@ -156,7 +143,7 @@ class SearchFragment : Fragment() {
             if (s?.isNotEmpty() == true) {
                 searchDebounce()
             } else {
-                mainHandler.removeCallbacksAndMessages(null)
+                searchJob?.cancel()
                 viewModel.setWaitingStateForScreen()
             }
         }
@@ -191,7 +178,7 @@ class SearchFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainHandler.removeCallbacksAndMessages(searchRunnable)
+        searchJob?.cancel()
     }
 
     private fun changeVisibilityOfElements(case: SearchScreenState) {
@@ -283,18 +270,21 @@ class SearchFragment : Fragment() {
     }
 
     private fun searchDebounce() {
-        mainHandler.removeCallbacksAndMessages(null)
-        if (searchEditText?.text?.isNotEmpty() == true)
-            mainHandler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_IN_MILLISEC)
+        searchJob?.cancel()
+        if (searchEditText?.text?.isNotEmpty() == true && searchEditText?.text?.toString() != previousTextInEditText)
+            previousTextInEditText = searchEditText?.text?.toString()!!
+        searchJob = lifecycleScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY_IN_MILLISEC)
+            viewModel.getTracksForList(searchEditText?.text.toString())
+        }
     }
 
     private fun tapDebounce() {
         isNotPressed = false
-        mainHandler.postDelayed(tapEnableRunnable, TAP_DEBOUNCE_DELAY_IN_MILLISEC)
-    }
-
-    private fun changeStateOfScreenToContent(listOfTracks: List<Track>) {
-        viewModel.setContentStateOfScreen(listOfTracks)
+        lifecycleScope.launch {
+            delay(TAP_DEBOUNCE_DELAY_IN_MILLISEC)
+            isNotPressed = true
+        }
     }
 
     companion object {
