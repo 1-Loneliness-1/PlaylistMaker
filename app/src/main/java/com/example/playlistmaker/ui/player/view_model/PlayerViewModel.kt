@@ -20,8 +20,14 @@ class PlayerViewModel(
 
     fun getPlayerStatusLiveData(): LiveData<PlayerState> = playerStatusLiveData
 
+    override fun onCleared() {
+        super.onCleared()
+        updateTimeOfTuneJob?.cancel()
+    }
+
     fun startPlayer() {
         playerInteractor.startPlayer()
+        updateTimeOfTuneJob?.cancel()
         updateTimeOfTuneJob = viewModelScope.launch {
             while (playerInteractor.isPlaying()) {
                 playerStatusLiveData.postValue(PlayerState.PlayingState(playerInteractor.getCurrentPosition()))
@@ -38,7 +44,6 @@ class PlayerViewModel(
 
     fun releasePlayer() {
         updateTimeOfTuneJob?.cancel()
-        updateTimeOfTuneJob = null
         playerInteractor.releaseResourcesForPlayer()
         playerStatusLiveData.postValue(PlayerState.DefaultState)
     }
@@ -50,7 +55,6 @@ class PlayerViewModel(
 
     fun setPrepState() {
         updateTimeOfTuneJob?.cancel()
-        updateTimeOfTuneJob = null
         playerStatusLiveData.postValue(PlayerState.PreparedState)
     }
 
