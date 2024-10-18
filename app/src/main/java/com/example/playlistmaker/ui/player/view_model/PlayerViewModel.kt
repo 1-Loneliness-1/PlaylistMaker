@@ -4,21 +4,30 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.domain.player.FavoriteTracksInteractor
 import com.example.playlistmaker.domain.player.PlayerInteractor
+import com.example.playlistmaker.domain.player.model.FavoriteTrackButtonState
 import com.example.playlistmaker.domain.player.model.PlayerState
+import com.example.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor
+    private val playerInteractor: PlayerInteractor,
+    private val favoriteTracksInteractor: FavoriteTracksInteractor
 ) : ViewModel() {
 
     private var updateTimeOfTuneJob: Job? = null
 
     private val playerStatusLiveData = MutableLiveData<PlayerState>(PlayerState.DefaultState)
+    private val favorTrackButtonStatusLiveData =
+        MutableLiveData<FavoriteTrackButtonState>(FavoriteTrackButtonState.IsNotFavoriteState)
 
     fun getPlayerStatusLiveData(): LiveData<PlayerState> = playerStatusLiveData
+
+    fun getFavorTrackButtonStatusLiveData(): LiveData<FavoriteTrackButtonState> =
+        favorTrackButtonStatusLiveData
 
     override fun onCleared() {
         super.onCleared()
@@ -56,6 +65,28 @@ class PlayerViewModel(
     fun setPrepState() {
         updateTimeOfTuneJob?.cancel()
         playerStatusLiveData.postValue(PlayerState.PreparedState)
+    }
+
+    suspend fun getStatusOfFavorTrackButton(currentTrackId: Long) {
+        favoriteTracksInteractor
+            .getTrackById(currentTrackId)
+            .collect { track ->
+                favorTrackButtonStatusLiveData.postValue(
+                    if (track == null) FavoriteTrackButtonState.IsNotFavoriteState
+                    else FavoriteTrackButtonState.FavoriteState
+                )
+            }
+
+    }
+
+    fun insertFavoriteTrackInDb(trackForInsert: Track) {
+        favoriteTracksInteractor.insertTrackToFavorite(trackForInsert)
+        favorTrackButtonStatusLiveData.postValue(FavoriteTrackButtonState.FavoriteState)
+    }
+
+    fun deleteTrackFromFavorite(trackForDelete: Track) {
+        favoriteTracksInteractor.deleteTrackFromFavorites(trackForDelete)
+        favorTrackButtonStatusLiveData.postValue(FavoriteTrackButtonState.IsNotFavoriteState)
     }
 
     companion object {
