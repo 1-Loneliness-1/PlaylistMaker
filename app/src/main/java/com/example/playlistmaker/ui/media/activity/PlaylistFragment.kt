@@ -13,7 +13,7 @@ class PlaylistFragment : Fragment() {
 
     private var binding: FragmentPlaylistBinding? = null
 
-    private val playlistsViewModel: PlaylistsViewModel by viewModel()
+    private val viewModel: PlaylistsViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

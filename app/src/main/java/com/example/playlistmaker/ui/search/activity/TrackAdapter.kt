@@ -57,12 +57,23 @@ class TrackAdapter(
                 .load(model.artworkUrl100)
                 .placeholder(R.drawable.song_cover_placeholder)
                 .centerCrop()
-                .transform(RoundedCorners(DimenConvertor.dpToPx(2f, binding.root.context)))
+                .transform(
+                    RoundedCorners(
+                        DimenConvertor.dpToPx(
+                            NUMBER_OF_DP_FOR_ROUNDING_CORNERS,
+                            binding.root.context
+                        )
+                    )
+                )
                 .into(binding.ivTrackCover)
             binding.tvTrackName.text = model.trackName
             binding.tvArtistName.text = model.artistName
             binding.tvTrackTime.text = model.trackTimeMillis
         }
+    }
+
+    companion object {
+        private const val NUMBER_OF_DP_FOR_ROUNDING_CORNERS = 2f
     }
 
 }

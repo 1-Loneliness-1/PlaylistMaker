@@ -1,6 +1,6 @@
 package com.example.playlistmaker.domain.player.model
 
-sealed class PlayerState() {
+sealed class PlayerState {
 
     data object DefaultState : PlayerState()
 

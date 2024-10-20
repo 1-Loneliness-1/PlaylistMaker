@@ -1,6 +1,10 @@
 package com.example.playlistmaker.di
 
+import com.example.playlistmaker.domain.media.FavoriteTracksListInteractor
+import com.example.playlistmaker.domain.media.impl.FavoriteTracksListInteractorImpl
+import com.example.playlistmaker.domain.player.FavoriteTracksInteractor
 import com.example.playlistmaker.domain.player.PlayerInteractor
+import com.example.playlistmaker.domain.player.impl.FavoriteTracksInteractorImpl
 import com.example.playlistmaker.domain.player.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.search.SharPrefInteractor
 import com.example.playlistmaker.domain.search.TracksInteractor
@@ -28,6 +32,14 @@ val domainModule = module {
 
     factoryOf(::SettingsInteractorImpl) {
         bind<SettingsInteractor>()
+    }
+
+    single<FavoriteTracksInteractor> {
+        FavoriteTracksInteractorImpl(get())
+    }
+
+    single<FavoriteTracksListInteractor> {
+        FavoriteTracksListInteractorImpl(get())
     }
 
 }

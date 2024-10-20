@@ -6,15 +6,18 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.domain.player.model.FavoriteTrackButtonState
 import com.example.playlistmaker.domain.player.model.PlayerState
 import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
 import com.example.playlistmaker.utils.DimenConvertor
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlayerActivity : AppCompatActivity() {
@@ -44,6 +47,7 @@ class PlayerActivity : AppCompatActivity() {
         val yearOfSoundPublished = binding?.tvYearOfSongChanging
         val genreOfSong = binding?.tvGenreChanging
         val countryOfSong = binding?.tvCountryOfSongChanging
+        val favoriteTrackButton = binding?.ibLike
 
         playStopButton = binding?.ibPlayStop
         currentTrackTime = binding?.tvCurrentTrackTime
@@ -52,6 +56,32 @@ class PlayerActivity : AppCompatActivity() {
             changeStateOfElements(playerState)
             if (playerState is PlayerState.PlayingState) {
                 currentTrackTime?.text = playerState.currentPosition
+            }
+        }
+
+        viewModel.getFavorTrackButtonStatusLiveData().observe(this) { favorTrackButtonState ->
+            when (favorTrackButtonState) {
+                is FavoriteTrackButtonState.IsNotFavoriteState -> {
+                    favoriteTrackButton?.setImageResource(R.drawable.like_icon)
+                }
+
+                is FavoriteTrackButtonState.FavoriteState -> {
+                    favoriteTrackButton?.setImageResource(R.drawable.liked_icon)
+                }
+            }
+            favoriteTrackButton?.isEnabled = true
+            favoriteTrackButton?.isClickable = true
+            favoriteTrackButton?.alpha = 1.0f
+        }
+
+        favoriteTrackButton?.setOnClickListener {
+            favoriteTrackButton.isEnabled = false
+            favoriteTrackButton.isClickable = false
+            favoriteTrackButton.alpha = 0.5f
+            if (viewModel.getFavorTrackButtonStatusLiveData().value is FavoriteTrackButtonState.IsNotFavoriteState) {
+                viewModel.insertFavoriteTrackInDb(currentTrack!!)
+            } else {
+                viewModel.deleteTrackFromFavorite(currentTrack!!)
             }
         }
 
@@ -66,16 +96,29 @@ class PlayerActivity : AppCompatActivity() {
                 .load(currentTrack?.artworkUrl100?.replace("100x100bb.jpg", "512x512bb.jpg"))
                 .placeholder(R.drawable.song_cover_placeholder)
                 .centerCrop()
-                .transform(RoundedCorners(DimenConvertor.dpToPx(8f, this)))
+                .transform(
+                    RoundedCorners(
+                        DimenConvertor.dpToPx(
+                            NUMBER_OF_DP_FOR_IMAGE_CORNERS_ROUNDING,
+                            this
+                        )
+                    )
+                )
                 .into(songCover!!)
             songTitle?.text = currentTrack?.trackName
             artistName?.text = currentTrack?.artistName
             trackDuration?.text = currentTrack?.trackTimeMillis
             groupOfAlbumInfo?.isVisible = currentTrack?.collectionName != null
             album?.text = currentTrack?.collectionName
-            yearOfSoundPublished?.text = currentTrack?.releaseDate?.split("-")?.get(0)
+            yearOfSoundPublished?.text =
+                currentTrack?.releaseDate?.split("-")?.get(POSITION_NUMBER_OF_YEAR_PUBLICATION)
             genreOfSong?.text = currentTrack?.primaryGenreName
             countryOfSong?.text = currentTrack?.country
+
+            lifecycleScope.launch {
+                viewModel.getStatusOfFavorTrackButton(currentTrack?.trackId!!)
+            }
+
         } else {
             Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_SHORT).show()
         }
@@ -134,6 +177,8 @@ class PlayerActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
+        private const val NUMBER_OF_DP_FOR_IMAGE_CORNERS_ROUNDING = 8f
+        private const val POSITION_NUMBER_OF_YEAR_PUBLICATION = 0
     }
 
 }

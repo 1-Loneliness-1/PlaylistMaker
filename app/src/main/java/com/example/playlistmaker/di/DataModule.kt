@@ -3,7 +3,11 @@ package com.example.playlistmaker.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.media.MediaPlayer
+import androidx.room.Room
+import com.example.playlistmaker.data.FavoriteTracksRepositoryImpl
 import com.example.playlistmaker.data.NetworkClient
+import com.example.playlistmaker.data.converters.TrackDbConvertor
+import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.mediaplayer.Playable
 import com.example.playlistmaker.data.mediaplayer.PlayerForMusic
 import com.example.playlistmaker.data.mediaplayer.PlayerRepository
@@ -15,6 +19,7 @@ import com.example.playlistmaker.data.search.impl.SharPrefRepositoryImpl
 import com.example.playlistmaker.data.search.impl.TracksRepositoryImpl
 import com.example.playlistmaker.data.settings.SettingsSharPrefRepository
 import com.example.playlistmaker.data.settings.impl.SettingsSharPrefRepositoryImpl
+import com.example.playlistmaker.domain.db.FavoriteTracksRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
@@ -54,4 +59,16 @@ val dataModule = module {
     factory {
         MediaPlayer()
     }
+
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
+    }
+
+    factory { TrackDbConvertor() }
+
+    single<FavoriteTracksRepository> {
+        FavoriteTracksRepositoryImpl(get(), get())
+    }
+
 }

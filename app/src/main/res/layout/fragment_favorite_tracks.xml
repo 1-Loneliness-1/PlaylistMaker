@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme.DayNightScreen"
@@ -13,9 +14,10 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="106dp"
+        android:layout_marginTop="88dp"
         android:contentDescription="@string/error"
-        android:src="?attr/foundNothingPlaceholder" />
+        android:src="?attr/foundNothingPlaceholder"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvFavoriteTracksIsEmpty"
@@ -28,6 +30,18 @@
         android:layout_marginHorizontal="@dimen/icon_size"
         android:layout_marginTop="@dimen/padding_dimen"
         android:text="@string/list_of_favorite_tracks_is_empty"
-        android:textFontWeight="400" />
+        android:textFontWeight="400"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFavoriteTracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 </RelativeLayout>

@@ -10,10 +10,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitNetworkClient : NetworkClient {
 
-    companion object {
-        const val ITUNES_BASE_URL = "https://itunes.apple.com"
-    }
-
     private val retrofit = Retrofit.Builder()
         .baseUrl(ITUNES_BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -26,17 +22,25 @@ class RetrofitNetworkClient : NetworkClient {
             is TracksSearchRequest -> {
                 withContext(Dispatchers.IO) {
                     try {
-                        itunesService.search(dto.searchExpression).apply { resultCode = 200 }
+                        itunesService.search(dto.searchExpression)
+                            .apply { resultCode = HTTP_OK_CODE }
                     } catch (e: Throwable) {
-                        Response().apply { resultCode = 500 }
+                        Response().apply { resultCode = HTTP_INTERNAL_SERVER_ERROR_CODE }
                     }
                 }
             }
 
             else -> {
-                Response().apply { resultCode = 400 }
+                Response().apply { resultCode = HTTP_BAD_REQUEST_CODE }
             }
         }
+    }
+
+    companion object {
+        const val ITUNES_BASE_URL = "https://itunes.apple.com"
+        const val HTTP_OK_CODE = 200
+        const val HTTP_BAD_REQUEST_CODE = 400
+        const val HTTP_INTERNAL_SERVER_ERROR_CODE = 500
     }
 
 }
