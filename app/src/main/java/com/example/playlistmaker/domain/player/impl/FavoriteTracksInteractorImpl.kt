@@ -17,7 +17,8 @@ class FavoriteTracksInteractorImpl(
         favoriteTracksRepository.deleteTrackFromFavorites(trackForDel)
     }
 
-    override fun getTrackById(trackId: Long): Flow<Track?> =
-        favoriteTracksRepository.getTrackById(trackId)
+    override fun getTrackById(trackId: Long): Flow<Track?> {
+        return favoriteTracksRepository.getTrackById(trackId)
+    }
 
 }

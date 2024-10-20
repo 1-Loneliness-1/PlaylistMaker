@@ -96,14 +96,22 @@ class PlayerActivity : AppCompatActivity() {
                 .load(currentTrack?.artworkUrl100?.replace("100x100bb.jpg", "512x512bb.jpg"))
                 .placeholder(R.drawable.song_cover_placeholder)
                 .centerCrop()
-                .transform(RoundedCorners(DimenConvertor.dpToPx(8f, this)))
+                .transform(
+                    RoundedCorners(
+                        DimenConvertor.dpToPx(
+                            NUMBER_OF_DP_FOR_IMAGE_CORNERS_ROUNDING,
+                            this
+                        )
+                    )
+                )
                 .into(songCover!!)
             songTitle?.text = currentTrack?.trackName
             artistName?.text = currentTrack?.artistName
             trackDuration?.text = currentTrack?.trackTimeMillis
             groupOfAlbumInfo?.isVisible = currentTrack?.collectionName != null
             album?.text = currentTrack?.collectionName
-            yearOfSoundPublished?.text = currentTrack?.releaseDate?.split("-")?.get(0)
+            yearOfSoundPublished?.text =
+                currentTrack?.releaseDate?.split("-")?.get(POSITION_NUMBER_OF_YEAR_PUBLICATION)
             genreOfSong?.text = currentTrack?.primaryGenreName
             countryOfSong?.text = currentTrack?.country
 
@@ -169,6 +177,8 @@ class PlayerActivity : AppCompatActivity() {
 
     companion object {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
+        private const val NUMBER_OF_DP_FOR_IMAGE_CORNERS_ROUNDING = 8f
+        private const val POSITION_NUMBER_OF_YEAR_PUBLICATION = 0
     }
 
 }

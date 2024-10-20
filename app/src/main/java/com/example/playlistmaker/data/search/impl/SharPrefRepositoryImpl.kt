@@ -17,10 +17,6 @@ class SharPrefRepositoryImpl(
 
         }
 
-    companion object {
-        private const val KEY_FOR_ARRAY_WITH_SEARCH_HISTORY = "elems_in_search_history"
-    }
-
     override fun getArrayListFromResource(): ArrayList<Track> {
         val json: String? = sharPref.getString(KEY_FOR_ARRAY_WITH_SEARCH_HISTORY, null)
         val listType = object : TypeToken<ArrayList<Track>>() {}.type
@@ -47,4 +43,9 @@ class SharPrefRepositoryImpl(
     override fun unregisterChangeListener() {
         sharPref.unregisterOnSharedPreferenceChangeListener(this.listener)
     }
+
+    companion object {
+        private const val KEY_FOR_ARRAY_WITH_SEARCH_HISTORY = "elems_in_search_history"
+    }
+
 }

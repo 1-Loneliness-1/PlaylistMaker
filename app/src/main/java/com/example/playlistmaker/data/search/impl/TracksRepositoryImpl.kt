@@ -14,51 +14,57 @@ class TracksRepositoryImpl(
     private val networkClient: NetworkClient
 ) : TracksRepository {
 
-    override fun searchTracks(expression: String): Flow<List<Track>> = flow {
-        val response = networkClient.doRequest(TracksSearchRequest(expression))
-        when (response.resultCode) {
-            200 -> {
-                with(response as TracksSearchResponse) {
-                    val listOfFoundedTracks = results.map {
-                        Track(
-                            it.trackId,
-                            it.trackName,
-                            it.artistName,
-                            SimpleDateFormat(
-                                "mm:ss",
-                                Locale.getDefault()
-                            ).format(it.trackTimeMillis),
-                            it.collectionName,
-                            it.releaseDate,
-                            it.primaryGenreName,
-                            it.country,
-                            it.artworkUrl100,
-                            it.previewUrl
-                        )
+    override fun searchTracks(expression: String): Flow<List<Track>> {
+        return flow {
+            val response = networkClient.doRequest(TracksSearchRequest(expression))
+            when (response.resultCode) {
+                HTTP_OK_CODE -> {
+                    with(response as TracksSearchResponse) {
+                        val listOfFoundedTracks = results.map {
+                            Track(
+                                it.trackId,
+                                it.trackName,
+                                it.artistName,
+                                SimpleDateFormat(
+                                    "mm:ss",
+                                    Locale.getDefault()
+                                ).format(it.trackTimeMillis),
+                                it.collectionName,
+                                it.releaseDate,
+                                it.primaryGenreName,
+                                it.country,
+                                it.artworkUrl100,
+                                it.previewUrl
+                            )
+                        }
+                        emit(listOfFoundedTracks)
                     }
-                    emit(listOfFoundedTracks)
                 }
-            }
 
-            else -> {
-                emit(
-                    listOf(
-                        Track(
-                            -1,
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            "",
-                            ""
+                else -> {
+                    emit(
+                        listOf(
+                            Track(
+                                -1,
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                "",
+                                ""
+                            )
                         )
                     )
-                )
+                }
             }
         }
+    }
+
+    companion object {
+        const val HTTP_OK_CODE = 200
     }
 
 }

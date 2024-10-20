@@ -63,6 +63,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         searchEditText = binding?.etSearch
         clearSearchEditTextButton = binding?.ivClearEditText
         searchTracksRecycler = binding?.rvTrackSearchList
@@ -112,7 +113,7 @@ class SearchFragment : Fragment() {
                 }
                 is SearchScreenState.Content -> {
                     changeVisibilityOfElements(screenState)
-                    if (screenState.listOfFoundedTracks.isNotEmpty() && screenState.listOfFoundedTracks[0].trackId.toInt() != -1) {
+                    if (screenState.listOfFoundedTracks.isNotEmpty() && screenState.listOfFoundedTracks[0].trackId.toInt() != BAD_REQUEST_TRACK_ID) {
                         adapter?.setData(screenState.listOfFoundedTracks)
                     }
                 }
@@ -211,7 +212,7 @@ class SearchFragment : Fragment() {
                     refreshButton?.isVisible = false
 
                     changeVisibilityOfSearchHistoryElements(false)
-                } else if ((case.listOfFoundedTracks[0].trackId.toInt() == -1)) {
+                } else if ((case.listOfFoundedTracks[0].trackId.toInt() == BAD_REQUEST_TRACK_ID)) {
                     progressBarTrackListLoading?.isVisible = false
                     searchTracksRecycler?.isVisible = false
 
@@ -291,6 +292,7 @@ class SearchFragment : Fragment() {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
         private const val SEARCH_DEBOUNCE_DELAY_IN_MILLISEC = 2000L
         private const val TAP_DEBOUNCE_DELAY_IN_MILLISEC = 1000L
+        private const val BAD_REQUEST_TRACK_ID = -1
     }
 
 }

@@ -9,7 +9,8 @@ class TracksInteractorImpl(
     private val tracksRepository: TracksRepository
 ) : TracksInteractor {
 
-    override fun searchTracks(expression: String): Flow<List<Track>> =
-        tracksRepository.searchTracks(expression)
+    override fun searchTracks(expression: String): Flow<List<Track>> {
+        return tracksRepository.searchTracks(expression)
+    }
 
 }
