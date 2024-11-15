@@ -54,7 +54,8 @@
         app:layout_constraintTop_toBottomOf="@id/bCreateNewPlaylist"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginTop="@dimen/padding_dimen"
-        android:paddingHorizontal="@dimen/padding_dimen"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginEnd="@dimen/icon_padding"
         android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

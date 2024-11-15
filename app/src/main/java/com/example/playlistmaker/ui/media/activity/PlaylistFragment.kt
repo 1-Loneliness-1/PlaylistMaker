@@ -33,6 +33,7 @@ class PlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.rvPlaylists.layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.rvPlaylists.addItemDecoration(SpacesItemDecoration(requireContext()))
 
         adapter = PlaylistAdapter {
             //TO do something by click on playlist element

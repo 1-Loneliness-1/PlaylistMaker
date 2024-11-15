@@ -164,6 +164,8 @@ class NewPlaylistFragment : Fragment() {
                 .show()
         } else {
             activity?.supportFragmentManager?.popBackStack()
+            activity?.findViewById<FragmentContainerView>(R.id.fcvPlayerActivity)?.visibility =
+                View.GONE
         }
     }
 
