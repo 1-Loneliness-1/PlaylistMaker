@@ -8,5 +8,7 @@
         <item name="colorOfDayNightElement">@color/yp_white</item>
         <item name="foundNothingPlaceholder">@drawable/found_nothing_placeholder_dark</item>
         <item name="noInternetPlaceholder">@drawable/no_internet_placeholder_dark</item>
+        <item name="colorOfBackground">@color/yp_black</item>
+        <item name="colorOfDecorativeLine">@color/yp_white</item>
     </style>
 </resources>

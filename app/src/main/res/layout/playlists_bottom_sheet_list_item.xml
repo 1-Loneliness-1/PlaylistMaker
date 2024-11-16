@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/ivPlaylistCover"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginVertical="@dimen/icon_padding"
+        android:layout_marginStart="12dp"
+        tools:src="@drawable/song_cover_placeholder" />
+
+    <TextView
+        android:id="@+id/tvTitleOfPlaylist"
+        style="@style/PlaylistItemCustomText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/ivPlaylistCover"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ivPlaylistCover"
+        android:layout_marginStart="@dimen/icon_padding"
+        android:layout_marginEnd="44dp"
+        android:layout_marginTop="6dp"
+        android:textSize="@dimen/smaller_text_size"
+        android:lineHeight="20dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="Some name of playlist" />
+
+    <TextView
+        android:id="@+id/tvNumOfTracks"
+        style="@style/PlaylistBottomSheetCustomText"
+        android:layout_width="@dimen/zero_dimen"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="44dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="@id/tvTitleOfPlaylist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitleOfPlaylist"
+        app:layout_constraintBottom_toBottomOf="@+id/ivPlaylistCover"
+        app:layout_constraintVertical_bias="1"
+        android:layout_marginBottom="6dp"
+        tools:text="100 треков" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,10 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.domain.media.model.Playlist
+import com.example.playlistmaker.domain.player.BottomSheetPlaylistsInteractor
 import com.example.playlistmaker.domain.player.FavoriteTracksInteractor
 import com.example.playlistmaker.domain.player.PlayerInteractor
+import com.example.playlistmaker.domain.player.model.AddTrackInPlaylistToastState
 import com.example.playlistmaker.domain.player.model.FavoriteTrackButtonState
 import com.example.playlistmaker.domain.player.model.PlayerState
+import com.example.playlistmaker.domain.player.model.PlaylistsBottomSheetScreenState
 import com.example.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -15,7 +19,8 @@ import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor,
-    private val favoriteTracksInteractor: FavoriteTracksInteractor
+    private val favoriteTracksInteractor: FavoriteTracksInteractor,
+    private val bottomSheetPlaylistsInteractor: BottomSheetPlaylistsInteractor
 ) : ViewModel() {
 
     private var updateTimeOfTuneJob: Job? = null
@@ -23,16 +28,58 @@ class PlayerViewModel(
     private val playerStatusLiveData = MutableLiveData<PlayerState>(PlayerState.DefaultState)
     private val favorTrackButtonStatusLiveData =
         MutableLiveData<FavoriteTrackButtonState>(FavoriteTrackButtonState.IsNotFavoriteState)
+    private val playlistsBottomSheetStatusLiveData =
+        MutableLiveData<PlaylistsBottomSheetScreenState>(
+            PlaylistsBottomSheetScreenState.ContentState(
+                emptyList()
+            )
+        )
+    private val addTrackInPlaylistToastStatusLiveData =
+        MutableLiveData<AddTrackInPlaylistToastState>()
 
     fun getPlayerStatusLiveData(): LiveData<PlayerState> = playerStatusLiveData
 
     fun getFavorTrackButtonStatusLiveData(): LiveData<FavoriteTrackButtonState> =
         favorTrackButtonStatusLiveData
 
+    fun getPlaylistsBottomSheetStatusLiveData(): LiveData<PlaylistsBottomSheetScreenState> =
+        playlistsBottomSheetStatusLiveData
+
+    fun getAddTrackInPlaylistToastStatusLiveData(): LiveData<AddTrackInPlaylistToastState> =
+        addTrackInPlaylistToastStatusLiveData
+
     override fun onCleared() {
         super.onCleared()
         updateTimeOfTuneJob?.cancel()
     }
+
+    fun addTrackInPlaylist(track: Track, selectedPlaylist: Playlist) {
+        viewModelScope.launch {
+            bottomSheetPlaylistsInteractor
+                .addNewTrackInPlaylist(track, selectedPlaylist)
+                .collect { messageForToast ->
+                    addTrackInPlaylistToastStatusLiveData.postValue(
+                        AddTrackInPlaylistToastState.Content(
+                            messageForToast
+                        )
+                    )
+                }
+        }
+    }
+
+    fun getAvailablePlaylistsFromDatabase() {
+        viewModelScope.launch {
+            bottomSheetPlaylistsInteractor
+                .getAllAvailablePlaylists()
+                .collect { playlists ->
+                    playlistsBottomSheetStatusLiveData.postValue(
+                        PlaylistsBottomSheetScreenState.ContentState(playlists)
+                    )
+                }
+        }
+    }
+
+
 
     fun startPlayer() {
         playerInteractor.startPlayer()

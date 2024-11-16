@@ -6,6 +6,8 @@ import android.media.MediaPlayer
 import androidx.room.Room
 import com.example.playlistmaker.data.FavoriteTracksRepositoryImpl
 import com.example.playlistmaker.data.NetworkClient
+import com.example.playlistmaker.data.PlaylistsRepositoryImpl
+import com.example.playlistmaker.data.converters.PlaylistDbConvertor
 import com.example.playlistmaker.data.converters.TrackDbConvertor
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.mediaplayer.Playable
@@ -20,6 +22,7 @@ import com.example.playlistmaker.data.search.impl.TracksRepositoryImpl
 import com.example.playlistmaker.data.settings.SettingsSharPrefRepository
 import com.example.playlistmaker.data.settings.impl.SettingsSharPrefRepositoryImpl
 import com.example.playlistmaker.domain.db.FavoriteTracksRepository
+import com.example.playlistmaker.domain.db.PlaylistsRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
@@ -62,6 +65,7 @@ val dataModule = module {
 
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .fallbackToDestructiveMigration()
             .build()
     }
 
@@ -69,6 +73,12 @@ val dataModule = module {
 
     single<FavoriteTracksRepository> {
         FavoriteTracksRepositoryImpl(get(), get())
+    }
+
+    factory { PlaylistDbConvertor() }
+
+    single<PlaylistsRepository> {
+        PlaylistsRepositoryImpl(get(), get())
     }
 
 }

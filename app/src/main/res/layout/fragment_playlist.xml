@@ -28,7 +28,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bCreateNewPlaylist"
         android:layout_marginTop="48dp"
-        android:src="?attr/foundNothingPlaceholder" />
+        android:src="?attr/foundNothingPlaceholder"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvPlaylistsNotCreatedYet"
@@ -41,6 +42,20 @@
         app:layout_constrainedWidth="true"
         app:layout_constrainedHeight="true"
         android:layout_marginTop="@dimen/padding_dimen"
-        android:text="@string/playlists_not_created" />
+        android:text="@string/playlists_not_created"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPlaylists"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/zero_dimen"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bCreateNewPlaylist"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/padding_dimen"
+        android:layout_marginStart="@dimen/padding_dimen"
+        android:layout_marginEnd="@dimen/icon_padding"
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

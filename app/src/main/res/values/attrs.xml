@@ -2,6 +2,8 @@
 <resources>
     <attr name="colorOfRightArrow" />
     <attr name="colorOfDayNightElement" />
+    <attr name="colorOfBackground" />
     <attr name="foundNothingPlaceholder" />
     <attr name="noInternetPlaceholder" />
+    <attr name="colorOfDecorativeLine" />
 </resources>
