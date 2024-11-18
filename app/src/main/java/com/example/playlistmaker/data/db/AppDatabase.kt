@@ -4,16 +4,17 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.playlistmaker.data.db.dao.PlaylistDao
 import com.example.playlistmaker.data.db.dao.TrackDao
+import com.example.playlistmaker.data.db.dao.TrackInPlaylistDao
+import com.example.playlistmaker.data.db.entity.FavoriteTrackEntity
 import com.example.playlistmaker.data.db.entity.PlaylistEntity
 import com.example.playlistmaker.data.db.entity.TrackEntity
-import com.example.playlistmaker.data.db.entity.TracksInPlaylistsEntity
 
 @Database(
-    version = 6,
+    version = 8,
     entities = [
-        TrackEntity::class,
+        FavoriteTrackEntity::class,
         PlaylistEntity::class,
-        TracksInPlaylistsEntity::class
+        TrackEntity::class
     ]
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -21,5 +22,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun trackDao(): TrackDao
 
     abstract fun playlistDao(): PlaylistDao
+
+    abstract fun trackInPlaylistDao(): TrackInPlaylistDao
 
 }
