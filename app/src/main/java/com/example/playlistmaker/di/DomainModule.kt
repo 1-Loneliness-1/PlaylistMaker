@@ -10,6 +10,8 @@ import com.example.playlistmaker.domain.player.PlayerInteractor
 import com.example.playlistmaker.domain.player.impl.BottomSheetPlaylistsInteractorImpl
 import com.example.playlistmaker.domain.player.impl.FavoriteTracksInteractorImpl
 import com.example.playlistmaker.domain.player.impl.PlayerInteractorImpl
+import com.example.playlistmaker.domain.playlist.TracksInPlaylistInteractor
+import com.example.playlistmaker.domain.playlist.impl.TracksInPlaylistInteractorImpl
 import com.example.playlistmaker.domain.search.SharPrefInteractor
 import com.example.playlistmaker.domain.search.TracksInteractor
 import com.example.playlistmaker.domain.search.impl.SharPrefInteractorImpl
@@ -51,7 +53,11 @@ val domainModule = module {
     }
 
     single<BottomSheetPlaylistsInteractor> {
-        BottomSheetPlaylistsInteractorImpl(get())
+        BottomSheetPlaylistsInteractorImpl(get(), get())
+    }
+
+    single<TracksInPlaylistInteractor> {
+        TracksInPlaylistInteractorImpl(get(), get())
     }
 
 }
