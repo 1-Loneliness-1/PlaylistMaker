@@ -202,4 +202,20 @@
         <item name="android:lineHeight">12dp</item>
         <item name="android:textColor">@color/yp_text_gray</item>
     </style>
+
+    <style name="PlaylistInfoCustomText">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontWeight">400</item>
+        <item name="android:lineHeight">20dp</item>
+        <item name="android:textColor">@color/yp_black</item>
+    </style>
+
+    <style name="PlaylistInfoTitleCustomText">
+        <item name="android:fontFamily">@font/ys_display_bold</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontWeight">700</item>
+        <item name="android:lineHeight">28dp</item>
+        <item name="android:textColor">@color/yp_black</item>
+    </style>
 </resources>
