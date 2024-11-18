@@ -10,6 +10,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.domain.media.model.PlaylistScreenState
 import com.example.playlistmaker.ui.media.view_model.PlaylistsViewModel
+import com.example.playlistmaker.ui.playlist.activity.PlaylistInfoFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -35,8 +36,19 @@ class PlaylistFragment : Fragment() {
         binding.rvPlaylists.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvPlaylists.addItemDecoration(SpacesItemDecoration(requireContext()))
 
-        adapter = PlaylistAdapter {
-            //TO do something by click on playlist element
+        adapter = PlaylistAdapter { selectedPlaylist ->
+            requireActivity().findViewById<BottomNavigationView>(R.id.bnvOnHostActivity).visibility =
+                View.GONE
+
+            requireActivity().supportFragmentManager
+                .beginTransaction()
+                .replace(
+                    R.id.fcvHostActivity,
+                    PlaylistInfoFragment.newInstance(selectedPlaylist.playlistId),
+                    null
+                )
+                .addToBackStack(null)
+                .commit()
         }
         binding.rvPlaylists.adapter = adapter
 

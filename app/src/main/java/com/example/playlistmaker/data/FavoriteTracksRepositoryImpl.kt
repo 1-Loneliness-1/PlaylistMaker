@@ -2,7 +2,7 @@ package com.example.playlistmaker.data
 
 import com.example.playlistmaker.data.converters.TrackDbConvertor
 import com.example.playlistmaker.data.db.AppDatabase
-import com.example.playlistmaker.data.db.entity.TrackEntity
+import com.example.playlistmaker.data.db.entity.FavoriteTrackEntity
 import com.example.playlistmaker.domain.db.FavoriteTracksRepository
 import com.example.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.GlobalScope
@@ -41,7 +41,7 @@ class FavoriteTracksRepositoryImpl(
         }
     }
 
-    private fun convertFromTrackEntity(favoriteTracks: List<TrackEntity>): List<Track> =
+    private fun convertFromTrackEntity(favoriteTracks: List<FavoriteTrackEntity>): List<Track> =
         favoriteTracks.map { track -> trackDbConvertor.map(track) }
 
 }

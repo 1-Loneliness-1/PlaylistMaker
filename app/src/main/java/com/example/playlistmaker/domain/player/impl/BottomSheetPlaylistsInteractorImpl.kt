@@ -1,13 +1,15 @@
 package com.example.playlistmaker.domain.player.impl
 
 import com.example.playlistmaker.domain.db.PlaylistsRepository
+import com.example.playlistmaker.domain.db.TracksInPlaylistsRepository
 import com.example.playlistmaker.domain.media.model.Playlist
 import com.example.playlistmaker.domain.player.BottomSheetPlaylistsInteractor
 import com.example.playlistmaker.domain.search.model.Track
 import kotlinx.coroutines.flow.Flow
 
 class BottomSheetPlaylistsInteractorImpl(
-    private val playlistsRepository: PlaylistsRepository
+    private val playlistsRepository: PlaylistsRepository,
+    private val tracksInPlaylistsRepository: TracksInPlaylistsRepository
 ) : BottomSheetPlaylistsInteractor {
 
     override fun addNewPlaylistInDatabase(playlist: Playlist) {
@@ -22,7 +24,7 @@ class BottomSheetPlaylistsInteractorImpl(
         trackForAdd: Track,
         selectedPlaylist: Playlist
     ): Flow<String> {
-        return playlistsRepository.addNewTrackInPlaylist(trackForAdd, selectedPlaylist)
+        return tracksInPlaylistsRepository.insertNewTrackInPlaylist(selectedPlaylist, trackForAdd)
     }
 
 }
