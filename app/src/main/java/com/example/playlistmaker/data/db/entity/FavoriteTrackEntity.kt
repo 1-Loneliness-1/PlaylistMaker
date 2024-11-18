@@ -2,31 +2,27 @@ package com.example.playlistmaker.data.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Entity(
-    "tracks",
-    primaryKeys = ["track_id", "playlist_id"]
-)
-data class TrackEntity(
-    @ColumnInfo("track_id")
-    val trackId: Long,
-    @ColumnInfo("playlist_id")
-    val playlistId: Long,
-    @ColumnInfo("track_title")
-    val trackTitle: String,
+@Entity(tableName = "favorite_tracks")
+data class FavoriteTrackEntity(
+    @PrimaryKey @ColumnInfo("track_id")
+    val trackId: String,
+    @ColumnInfo("track_name")
+    val trackName: String,
     @ColumnInfo("artist_name")
     val artistName: String,
-    @ColumnInfo("track_duration")
+    @ColumnInfo("track_time")
     val trackTimeMillis: String,
-    @ColumnInfo("album")
-    val album: String?,
+    @ColumnInfo("collection_title")
+    val collectionName: String?,
     @ColumnInfo("release_date")
     val releaseDate: String,
     @ColumnInfo("genre")
-    val genre: String,
+    val primaryGenreName: String,
     @ColumnInfo("country")
     val country: String,
-    @ColumnInfo("song_cover_url")
+    @ColumnInfo("album_cover_url")
     val artworkUrl100: String,
     @ColumnInfo("song_preview_url")
     val previewUrl: String
