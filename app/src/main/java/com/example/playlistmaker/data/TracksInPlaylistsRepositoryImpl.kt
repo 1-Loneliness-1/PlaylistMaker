@@ -40,17 +40,19 @@ class TracksInPlaylistsRepositoryImpl(
                     tracksInPlaylist.add(trackForAdd)
                     val listOfTracksId =
                         tracksInPlaylist.map { trackInPlaylist -> trackInPlaylist.trackId }
-                    database.trackInPlaylistDao().changeStateOfPlaylist(
-                        updatedPlaylist.playlistId,
-                        Gson().toJson(listOfTracksId)
-                    )
                     database.trackInPlaylistDao().insertNewTrackInPlaylist(trackForAdd)
+                    database
+                        .trackInPlaylistDao()
+                        .insertNewTrackInPlaylistTable(
+                            updatedPlaylist.playlistId,
+                            Gson().toJson(listOfTracksId)
+                        )
 
                     emit("Добавлено в плейлист ${updatedPlaylist.playlistTitle}")
                 }
             } else {
                 database.trackInPlaylistDao().insertNewTrackInPlaylist(trackForAdd)
-                database.trackInPlaylistDao().changeStateOfPlaylist(
+                database.trackInPlaylistDao().insertNewTrackInPlaylistTable(
                     updatedPlaylist.playlistId,
                     Gson().toJson(listOf(trackForAdd))
                 )
@@ -59,18 +61,44 @@ class TracksInPlaylistsRepositoryImpl(
         }
     }
 
+    override fun insertNewTrackInPlaylistTable(
+        selectedPlaylistId: Long,
+        updatedListOfTracks: String
+    ) {
+        GlobalScope.launch {
+            database.trackInPlaylistDao()
+                .insertNewTrackInPlaylistTable(selectedPlaylistId, updatedListOfTracks)
+        }
+    }
+
+    override fun deleteTrackFromPlaylist(updatedPlaylistId: Long, deletedTrack: Track) {
+        GlobalScope.launch {
+            val trackForDelete = convertor.map(updatedPlaylistId, deletedTrack)
+            database.trackInPlaylistDao().deleteTrackFromPlaylist(trackForDelete)
+        }
+    }
+
+    override fun deleteTrackFromPlaylistTable(
+        selectedPlaylistId: Long,
+        updatedListOfTracks: String
+    ) {
+        GlobalScope.launch {
+            database.trackInPlaylistDao()
+                .deleteTrackByPlaylistTable(selectedPlaylistId, updatedListOfTracks)
+        }
+    }
+
+    override fun deleteAllTracksInPlaylist(deletedPlaylistId: Long) {
+        GlobalScope.launch {
+            database.trackInPlaylistDao().deleteAllTracksInPlaylist(deletedPlaylistId)
+        }
+    }
+
     override fun getAllTracksInPlaylist(selectedPlaylistId: Long): Flow<List<Track>> {
         return flow {
             val tracksInPlaylist =
                 database.trackInPlaylistDao().getAllTracksInPlaylist(selectedPlaylistId)
             emit(tracksInPlaylist.map { track -> convertor.map(track) })
-        }
-    }
-
-    override fun changeStateOfPlaylist(selectedPlaylistId: Long, updatedListOfTracks: String) {
-        GlobalScope.launch {
-            database.trackInPlaylistDao()
-                .changeStateOfPlaylist(selectedPlaylistId, updatedListOfTracks)
         }
     }
 

@@ -8,8 +8,14 @@ interface TracksInPlaylistsRepository {
 
     fun insertNewTrackInPlaylist(updatedPlaylist: Playlist, insertedTrack: Track): Flow<String>
 
-    fun getAllTracksInPlaylist(selectedPlaylistId: Long): Flow<List<Track>>
+    fun insertNewTrackInPlaylistTable(selectedPlaylistId: Long, updatedListOfTracks: String)
 
-    fun changeStateOfPlaylist(selectedPlaylistId: Long, updatedListOfTracks: String)
+    fun deleteTrackFromPlaylist(updatedPlaylistId: Long, deletedTrack: Track)
+
+    fun deleteTrackFromPlaylistTable(selectedPlaylistId: Long, updatedListOfTracks: String)
+
+    fun deleteAllTracksInPlaylist(deletedPlaylistId: Long)
+
+    fun getAllTracksInPlaylist(selectedPlaylistId: Long): Flow<List<Track>>
 
 }

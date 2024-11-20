@@ -20,6 +20,29 @@ class PlaylistsRepositoryImpl(
         }
     }
 
+    override fun updatePlaylist(
+        updatedPlaylistId: Long,
+        updatedPlaylistTitle: String,
+        updatedPlaylistDescription: String?,
+        updatedPlaylistCoverPath: String?
+    ) {
+        GlobalScope.launch {
+            database.playlistDao().updatePlaylist(
+                updatedPlaylistId,
+                updatedPlaylistTitle,
+                updatedPlaylistDescription,
+                updatedPlaylistCoverPath
+            )
+        }
+    }
+
+    override fun deletePlaylist(deletedPlaylistId: Long) {
+        GlobalScope.launch {
+            val playlistForDelete = database.playlistDao().getPlaylistInfoById(deletedPlaylistId)
+            database.playlistDao().deletePlaylist(playlistForDelete)
+        }
+    }
+
     override fun getPlaylistInfoById(selectedPlaylistId: Long): Flow<Playlist> {
         return flow {
             emit(convertor.map(database.playlistDao().getPlaylistInfoById(selectedPlaylistId)))
