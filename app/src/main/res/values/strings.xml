@@ -35,4 +35,8 @@
     <string name="description">Описание</string>
     <string name="create">Создать</string>
     <string name="add_in_playlist">Добавить в плейлист</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+    <string name="share">Поделиться</string>
+    <string name="edit_information">Редактировать информацию</string>
+    <string name="no_tracks_in_playlist">В этом плейлисте\nнет треков</string>
 </resources>
