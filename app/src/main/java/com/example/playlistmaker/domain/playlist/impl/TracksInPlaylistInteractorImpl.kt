@@ -12,6 +12,25 @@ class TracksInPlaylistInteractorImpl(
     private val tracksInPlaylistsRepository: TracksInPlaylistsRepository
 ) : TracksInPlaylistInteractor {
 
+    override fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track) {
+        tracksInPlaylistsRepository.deleteTrackFromPlaylist(selectedPlaylistId, deletedTrack)
+    }
+
+    override fun deleteTrackFromPlaylistTable(
+        selectedPlaylistId: Long,
+        updatedListOfTracks: String
+    ) {
+        tracksInPlaylistsRepository.deleteTrackFromPlaylistTable(
+            selectedPlaylistId,
+            updatedListOfTracks
+        )
+    }
+
+    override fun deleteAllTracksInPlaylist(deletedPlaylistId: Long) {
+        tracksInPlaylistsRepository.deleteAllTracksInPlaylist(deletedPlaylistId)
+        playlistsRepository.deletePlaylist(deletedPlaylistId)
+    }
+
     override fun getPlaylistInfoById(selectedPlaylistId: Long): Flow<Playlist> {
         return playlistsRepository.getPlaylistInfoById(selectedPlaylistId)
     }

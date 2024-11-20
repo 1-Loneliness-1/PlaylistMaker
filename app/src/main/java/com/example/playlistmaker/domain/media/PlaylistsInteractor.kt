@@ -7,6 +7,15 @@ interface PlaylistsInteractor {
 
     fun insertNewPlaylist(playlist: Playlist)
 
+    fun getPlaylistInfoById(selectedPlaylistId: Long): Flow<Playlist>
+
     fun getAllPlaylists(): Flow<List<Playlist>>
+
+    fun updatePlaylist(
+        updatedPlaylistId: Long,
+        updatedPlaylistTitle: String,
+        updatedPlaylistDescription: String?,
+        updatedPlaylistCoverPath: String?
+    )
 
 }
