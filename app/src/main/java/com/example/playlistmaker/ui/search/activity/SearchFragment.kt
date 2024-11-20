@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.search.model.SearchScreenState
+import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.google.gson.Gson
@@ -77,7 +78,7 @@ class SearchFragment : Fragment() {
         youLookedForText = binding?.tvYouLookedFor
         progressBarTrackListLoading = binding?.pbListOfTracksLoading
 
-        adapter = TrackAdapter {
+        val onItemClickListener: (Track) -> Unit = {
             if (isNotPressed) {
                 tapDebounce()
                 viewModel.saveNewTrack(it)
@@ -87,9 +88,16 @@ class SearchFragment : Fragment() {
                 startActivity(playerIntent)
             }
         }
+        val onItemLongClick: (Track) -> Boolean = {
+            true
+        }
+        adapter = TrackAdapter(
+            onItemClicked = onItemClickListener,
+            onLongItemClicked = onItemLongClick
+        )
         searchTracksRecycler?.adapter = adapter
 
-        searchHistoryAdapter = TrackAdapter {
+        val onItemClickListenerForSearchHistoryList: (Track) -> Unit = {
             if (isNotPressed) {
                 tapDebounce()
                 viewModel.saveNewTrack(it)
@@ -100,6 +108,10 @@ class SearchFragment : Fragment() {
                 startActivity(playerIntent)
             }
         }
+        searchHistoryAdapter = TrackAdapter(
+            onItemClicked = onItemClickListenerForSearchHistoryList,
+            onLongItemClicked = onItemLongClick
+        )
         searchHistoryRecycler?.adapter = searchHistoryAdapter
 
         viewModel.getSearchScreenStateLiveData().observe(viewLifecycleOwner) { screenState ->

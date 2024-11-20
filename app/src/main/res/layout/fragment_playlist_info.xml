@@ -139,7 +139,7 @@
         android:orientation="vertical"
         android:background="@drawable/background_for_playlists_bottom_sheet"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="360dp"
+        app:behavior_peekHeight="120dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
@@ -154,8 +154,137 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/ivNoTracksInPlaylistPlaceholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_gravity="center"
+            android:src="?attr/foundNothingPlaceholder"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvNoTracksInPlaylistText"
+            style="@style/ErrorTextForPlaceholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_dimen"
+            android:layout_gravity="center"
+            android:text="@string/no_tracks_in_playlist"
+            android:visibility="gone" />
 
     </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clMenuBottomSheet"
+        android:theme="@style/Theme.DayNightScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_for_playlists_bottom_sheet"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="320dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <View
+            android:id="@+id/vDecorativeLine"
+            android:background="@drawable/decorative_line"
+            android:layout_width="50dp"
+            android:layout_height="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="@dimen/icon_padding"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:id="@+id/ivPlaylistCoverForMenu"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vDecorativeLine"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="20dp"
+            tools:src="@drawable/song_cover_placeholder" />
+
+        <TextView
+            android:id="@+id/tvPlaylistTitleForMenu"
+            style="@style/PlaylistItemCustomText"
+            android:layout_width="@dimen/zero_dimen"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/ivPlaylistCoverForMenu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/ivPlaylistCoverForMenu"
+            app:layout_constraintBottom_toTopOf="@id/tvTrackCountForMenu"
+            app:layout_constraintVertical_bias="0"
+            android:layout_marginStart="@dimen/icon_padding"
+            android:layout_marginEnd="44dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="1dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:lineHeight="20dp"
+            tools:text="Wait for menu title" />
+
+        <TextView
+            android:id="@+id/tvTrackCountForMenu"
+            style="@style/TrackListTextView"
+            android:layout_width="@dimen/zero_dimen"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/tvPlaylistTitleForMenu"
+            app:layout_constraintEnd_toEndOf="@id/tvPlaylistTitleForMenu"
+            app:layout_constraintTop_toBottomOf="@id/tvPlaylistTitleForMenu"
+            app:layout_constraintBottom_toBottomOf="@id/ivPlaylistCoverForMenu"
+            app:layout_constraintVertical_bias="1"
+            android:layout_marginBottom="6dp"
+            android:lineHeight="12dp"
+            tools:text="100500 треков" />
+
+        <TextView
+            android:id="@+id/tvShareInMenu"
+            style="@style/PlaylistItemCustomText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ivPlaylistCoverForMenu"
+            android:paddingStart="@dimen/padding_dimen"
+            android:paddingEnd="44dp"
+            android:paddingVertical="20dp"
+            android:layout_marginTop="@dimen/padding_dimen"
+            android:lineHeight="20dp"
+            android:text="@string/share" />
+
+        <TextView
+            android:id="@+id/tvEditInformationAboutPlaylistInMenu"
+            style="@style/PlaylistItemCustomText"
+            android:layout_width="@dimen/zero_dimen"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/tvShareInMenu"
+            app:layout_constraintEnd_toEndOf="@id/tvShareInMenu"
+            app:layout_constraintTop_toBottomOf="@id/tvShareInMenu"
+            android:paddingStart="@dimen/padding_dimen"
+            android:paddingEnd="44dp"
+            android:paddingVertical="20dp"
+            android:lineHeight="20dp"
+            android:text="@string/edit_information" />
+
+        <TextView
+            android:id="@+id/tvDeletePlaylistInMenu"
+            style="@style/PlaylistItemCustomText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/tvEditInformationAboutPlaylistInMenu"
+            app:layout_constraintEnd_toEndOf="@id/tvEditInformationAboutPlaylistInMenu"
+            app:layout_constraintTop_toBottomOf="@id/tvEditInformationAboutPlaylistInMenu"
+            android:paddingStart="@dimen/padding_dimen"
+            android:paddingEnd="44dp"
+            android:paddingVertical="20dp"
+            android:lineHeight="20dp"
+            android:text="@string/delete_playlist" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

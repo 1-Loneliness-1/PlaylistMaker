@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.playlist.TracksInPlaylistInteractor
 import com.example.playlistmaker.domain.playlist.model.BottomSheetTrackListState
 import com.example.playlistmaker.domain.playlist.model.PlaylistInfoScreenState
+import com.example.playlistmaker.domain.search.model.Track
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
 class PlaylistInfoViewModel(
@@ -34,6 +36,36 @@ class PlaylistInfoViewModel(
                         )
                     )
                 }
+        }
+
+        updateTrackListInBottomSheet(selectedPlaylistId)
+    }
+
+    fun deletePlaylistById(deletedPlaylistId: Long) {
+        tracksInPlaylistsInteractor.deleteAllTracksInPlaylist(deletedPlaylistId)
+    }
+
+    fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track) {
+        tracksInPlaylistsInteractor.deleteTrackFromPlaylist(selectedPlaylistId, deletedTrack)
+
+        viewModelScope.launch {
+            tracksInPlaylistsInteractor
+                .getAllTracksInPlaylist(selectedPlaylistId)
+                .collect { listOfTracks ->
+                    val listOfTracksIds = listOfTracks.map { track -> track.trackId }
+                    tracksInPlaylistsInteractor.deleteTrackFromPlaylistTable(
+                        selectedPlaylistId,
+                        Gson().toJson(listOfTracksIds)
+                    )
+                }
+        }
+
+        getPlaylistInfoById(selectedPlaylistId)
+        updateTrackListInBottomSheet(selectedPlaylistId)
+    }
+
+    private fun updateTrackListInBottomSheet(selectedPlaylistId: Long) {
+        viewModelScope.launch {
             tracksInPlaylistsInteractor.getAllTracksInPlaylist(selectedPlaylistId)
                 .collect { listOfTracks ->
                     bottomSheetTrackListStatusLiveData.postValue(

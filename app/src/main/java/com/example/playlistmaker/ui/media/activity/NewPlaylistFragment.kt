@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentNewPlaylistBinding
+import com.example.playlistmaker.domain.media.model.EditPlaylistScreenState
 import com.example.playlistmaker.domain.media.model.Playlist
 import com.example.playlistmaker.ui.media.view_model.NewPlaylistViewModel
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
@@ -83,28 +84,8 @@ class NewPlaylistFragment : Fragment() {
             pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageOnly))
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            showDialogOnClosingFragment()
-        }
-
-        val filePath = File(
-            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            "PlaylistsCovers"
-        )
-
         binding.bSavePlaylist.setOnClickListener {
-            if (!filePath.exists()) {
-                filePath.mkdirs()
-            }
-            val file = File(filePath, "${binding.etTitleOfPlaylist.text}_cover.jpg")
-            if (uriOfImageForSave != null) {
-                val inputStream =
-                    requireContext().contentResolver.openInputStream(uriOfImageForSave!!)
-                val outputStream = FileOutputStream(file)
-                BitmapFactory
-                    .decodeStream(inputStream)
-                    .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
-            }
+            val fileWithCover = savePlaylistCoverInExternalMemory()
 
             viewModel.savePlaylistInDatabase(
                 Playlist(
@@ -118,7 +99,7 @@ class NewPlaylistFragment : Fragment() {
                     if (binding.ivAddPlaylistCover.drawable == defaultImage) {
                         null
                     } else {
-                        file.path
+                        fileWithCover.path
                     },
                     null,
                     INIT_NUMBER_OF_TRACKS_IN_PLAYLIST
@@ -134,15 +115,121 @@ class NewPlaylistFragment : Fragment() {
                 View.GONE
             activity?.supportFragmentManager?.popBackStack()
         }
+
+        val bundle = this.arguments
+        if (bundle != null) {
+            val currentPlaylistId = bundle.getLong(KEY_FOR_BUNDLE_DATA)
+
+            binding.tvNewPlaylistHeader.text = "Редактировать"
+
+            viewModel.getEditPlaylistScreenStatusLiveData()
+                .observe(viewLifecycleOwner) { editPlaylistScreenState ->
+                    when (editPlaylistScreenState) {
+                        is EditPlaylistScreenState.ContentState -> {
+                            if (editPlaylistScreenState.currentPlaylist.playlistCoverPath != null) {
+                                val imgFile =
+                                    File(editPlaylistScreenState.currentPlaylist.playlistCoverPath)
+                                Glide.with(requireContext())
+                                    .load(imgFile)
+                                    .placeholder(R.drawable.song_cover_placeholder)
+                                    .centerCrop()
+                                    .transform(
+                                        RoundedCorners(
+                                            DimenConvertor.dpToPx(
+                                                NUMBER_OF_DP_FOR_IMAGE_CORNERS_ROUNDING,
+                                                requireContext()
+                                            )
+                                        )
+                                    )
+                                    .into(binding.ivAddPlaylistCover)
+                            }
+
+                            binding.etTitleOfPlaylist.setText(editPlaylistScreenState.currentPlaylist.playlistTitle)
+
+                            if (editPlaylistScreenState.currentPlaylist.playlistDescription != null) {
+                                binding.etPlaylistDescription.setText(editPlaylistScreenState.currentPlaylist.playlistDescription)
+                            }
+                        }
+                    }
+                }
+
+            binding.bSavePlaylist.apply {
+                text = "Сохранить"
+
+                setOnClickListener {
+                    val updatedPlaylistTitle = binding.etTitleOfPlaylist.text.toString()
+                    val updatedPlaylistDescription =
+                        if (binding.etPlaylistDescription.text.isEmpty() || binding.etPlaylistDescription.text.isBlank()) {
+                            null
+                        } else {
+                            binding.etPlaylistDescription.text.toString()
+                        }
+
+                    val imgFile = savePlaylistCoverInExternalMemory()
+
+                    val updatedPlaylistCoverPath =
+                        if (binding.ivAddPlaylistCover.drawable == defaultImage) {
+                            null
+                        } else {
+                            imgFile.path
+                        }
+
+                    viewModel.updatePlaylist(
+                        currentPlaylistId,
+                        updatedPlaylistTitle,
+                        updatedPlaylistDescription,
+                        updatedPlaylistCoverPath
+                    )
+
+                    activity?.supportFragmentManager?.popBackStack()
+                }
+            }
+
+            binding.ivBackToPrevScreen.setOnClickListener {
+                activity?.supportFragmentManager?.popBackStack()
+            }
+
+            requireActivity().onBackPressedDispatcher.addCallback(this) {
+                activity?.supportFragmentManager?.popBackStack()
+            }
+
+            viewModel.getInfoAboutPlaylistById(currentPlaylistId)
+        } else {
+            requireActivity().onBackPressedDispatcher.addCallback(this) {
+                showDialogOnClosingFragment()
+            }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        activity?.findViewById<BottomNavigationView>(R.id.bnvOnHostActivity)?.visibility =
-            View.VISIBLE
         if (activity is PlayerActivity) {
+            activity?.findViewById<BottomNavigationView>(R.id.bnvOnHostActivity)?.visibility =
+                View.VISIBLE
             (activity as PlayerActivity).updateDataInPlaylistsRecyclerView()
         }
+    }
+
+    private fun savePlaylistCoverInExternalMemory(): File {
+        val filePath = File(
+            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+            "PlaylistsCovers"
+        )
+
+        if (!filePath.exists()) {
+            filePath.mkdirs()
+        }
+        val file = File(filePath, "${binding.etTitleOfPlaylist.text}_cover.jpg")
+        if (uriOfImageForSave != null) {
+            val inputStream =
+                requireContext().contentResolver.openInputStream(uriOfImageForSave!!)
+            val outputStream = FileOutputStream(file)
+            BitmapFactory
+                .decodeStream(inputStream)
+                .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
+        }
+
+        return file
     }
 
     private fun showDialogOnClosingFragment() {
@@ -173,8 +260,19 @@ class NewPlaylistFragment : Fragment() {
         private const val NUMBER_OF_DP_FOR_IMAGE_CORNERS_ROUNDING = 8f
         private const val PLAYLIST_ID_PLACEHOLDER = 0L
         private const val INIT_NUMBER_OF_TRACKS_IN_PLAYLIST = 0
+        private const val DEFAULT_VALUE_OF_PLAYLIST_ID = -1L
+        private const val KEY_FOR_BUNDLE_DATA = "saved_playlist_id"
 
-        fun newInstance() = NewPlaylistFragment()
+        fun newInstance(selectedPlaylistId: Long = DEFAULT_VALUE_OF_PLAYLIST_ID): NewPlaylistFragment {
+            val fragment = NewPlaylistFragment()
+            if (selectedPlaylistId != DEFAULT_VALUE_OF_PLAYLIST_ID) {
+                val bundle = Bundle()
+                bundle.putLong(KEY_FOR_BUNDLE_DATA, selectedPlaylistId)
+                fragment.arguments = bundle
+            }
+
+            return fragment
+        }
     }
 
 }
