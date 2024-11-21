@@ -16,18 +16,7 @@ class TracksInPlaylistInteractorImpl(
         tracksInPlaylistsRepository.deleteTrackFromPlaylist(selectedPlaylistId, deletedTrack)
     }
 
-    override fun deleteTrackFromPlaylistTable(
-        selectedPlaylistId: Long,
-        updatedListOfTracks: String
-    ) {
-        tracksInPlaylistsRepository.deleteTrackFromPlaylistTable(
-            selectedPlaylistId,
-            updatedListOfTracks
-        )
-    }
-
-    override fun deleteAllTracksInPlaylist(deletedPlaylistId: Long) {
-        tracksInPlaylistsRepository.deleteAllTracksInPlaylist(deletedPlaylistId)
+    override fun deletePlaylist(deletedPlaylistId: Long) {
         playlistsRepository.deletePlaylist(deletedPlaylistId)
     }
 

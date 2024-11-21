@@ -20,11 +20,8 @@ class BottomSheetPlaylistsInteractorImpl(
         return playlistsRepository.getAllPlaylists()
     }
 
-    override fun addNewTrackInPlaylist(
-        trackForAdd: Track,
-        selectedPlaylist: Playlist
-    ): Flow<String> {
-        return tracksInPlaylistsRepository.insertNewTrackInPlaylist(selectedPlaylist, trackForAdd)
+    override fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track): Flow<String> {
+        return tracksInPlaylistsRepository.insertNewTrack(updatedPlaylistId, insertedTrack)
     }
 
 }

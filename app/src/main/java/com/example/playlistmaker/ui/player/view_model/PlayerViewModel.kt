@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.domain.media.model.Playlist
 import com.example.playlistmaker.domain.player.BottomSheetPlaylistsInteractor
 import com.example.playlistmaker.domain.player.FavoriteTracksInteractor
 import com.example.playlistmaker.domain.player.PlayerInteractor
@@ -53,10 +52,10 @@ class PlayerViewModel(
         updateTimeOfTuneJob?.cancel()
     }
 
-    fun addTrackInPlaylist(track: Track, selectedPlaylist: Playlist) {
+    fun addTrackInPlaylist(selectedPlaylistId: Long, trackForAdd: Track) {
         viewModelScope.launch {
             bottomSheetPlaylistsInteractor
-                .addNewTrackInPlaylist(track, selectedPlaylist)
+                .insertNewTrack(selectedPlaylistId, trackForAdd)
                 .collect { messageForToast ->
                     addTrackInPlaylistToastStatusLiveData.postValue(
                         AddTrackInPlaylistToastState.Content(

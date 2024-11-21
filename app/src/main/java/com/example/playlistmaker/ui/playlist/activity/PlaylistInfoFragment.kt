@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistInfoBinding
 import com.example.playlistmaker.domain.playlist.model.BottomSheetTrackListState
@@ -96,11 +97,15 @@ class PlaylistInfoFragment : Fragment() {
                                 .load(fileWithPlaylistCover)
                                 .placeholder(R.drawable.song_cover_placeholder)
                                 .centerCrop()
+                                .skipMemoryCache(true)
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
                                 .into(binding.ivInfoPlaylistCover)
                             Glide.with(this)
                                 .load(fileWithPlaylistCover)
                                 .placeholder(R.drawable.song_cover_placeholder)
                                 .centerCrop()
+                                .skipMemoryCache(true)
+                                .diskCacheStrategy(DiskCacheStrategy.NONE)
                                 .into(binding.ivPlaylistCoverForMenu)
                         } else {
                             binding.ivInfoPlaylistCover.setImageResource(R.drawable.song_cover_placeholder)

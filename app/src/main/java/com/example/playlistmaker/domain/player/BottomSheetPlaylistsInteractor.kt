@@ -10,6 +10,6 @@ interface BottomSheetPlaylistsInteractor {
 
     fun getAllAvailablePlaylists(): Flow<List<Playlist>>
 
-    fun addNewTrackInPlaylist(trackForAdd: Track, selectedPlaylist: Playlist): Flow<String>
+    fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track): Flow<String>
 
 }

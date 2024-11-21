@@ -8,9 +8,7 @@ interface TracksInPlaylistInteractor {
 
     fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track)
 
-    fun deleteTrackFromPlaylistTable(selectedPlaylistId: Long, updatedListOfTracks: String)
-
-    fun deleteAllTracksInPlaylist(deletedPlaylistId: Long)
+    fun deletePlaylist(deletedPlaylistId: Long)
 
     fun getPlaylistInfoById(selectedPlaylistId: Long): Flow<Playlist>
 

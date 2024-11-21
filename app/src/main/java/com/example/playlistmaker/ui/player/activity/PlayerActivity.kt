@@ -63,7 +63,7 @@ class PlayerActivity : AppCompatActivity() {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
         val playlistsBottomSheetAdapter = PlaylistsAdapter { selectedPlaylist ->
-            viewModel.addTrackInPlaylist(currentTrack!!, selectedPlaylist)
+            viewModel.addTrackInPlaylist(selectedPlaylist.playlistId, currentTrack!!)
         }
         binding.rvAvailablePlaylists.adapter = playlistsBottomSheetAdapter
 
