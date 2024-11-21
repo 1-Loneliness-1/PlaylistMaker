@@ -11,21 +11,21 @@ import com.example.playlistmaker.data.db.entity.TrackEntity
 interface TrackInPlaylistDao {
 
     @Insert(TrackEntity::class, OnConflictStrategy.IGNORE)
-    suspend fun insertNewTrackInPlaylist(insertedTrack: TrackEntity)
+    suspend fun insertNewTrack(insertedTrack: TrackEntity)
 
     @Query("UPDATE playlists SET list_of_tracks = :updatedListOfTracks, track_count = track_count + 1 WHERE playlist_id = :selectedPlaylistId")
     suspend fun insertNewTrackInPlaylistTable(selectedPlaylistId: Long, updatedListOfTracks: String)
 
     @Delete(TrackEntity::class)
-    suspend fun deleteTrackFromPlaylist(trackForDelete: TrackEntity)
-
-    @Query("DELETE FROM tracks WHERE playlist_id = :deletedPlaylistId")
-    suspend fun deleteAllTracksInPlaylist(deletedPlaylistId: Long)
+    suspend fun deleteTrack(deletedTrack: TrackEntity)
 
     @Query("UPDATE playlists SET list_of_tracks = :updatedListOfTracks, track_count = track_count - 1 WHERE playlist_id = :selectedPlaylistId")
-    suspend fun deleteTrackByPlaylistTable(selectedPlaylistId: Long, updatedListOfTracks: String)
+    suspend fun deleteTrackByPlaylistTable(selectedPlaylistId: Long, updatedListOfTracks: String?)
 
-    @Query("SELECT * FROM tracks WHERE playlist_id = :selectedPlaylistId ORDER BY rowid DESC")
-    suspend fun getAllTracksInPlaylist(selectedPlaylistId: Long): MutableList<TrackEntity>
+    @Query("SELECT * FROM tracks WHERE track_id = :selectedTrackId")
+    suspend fun getTrackInfoById(selectedTrackId: Long): TrackEntity?
+
+    @Query("SELECT * FROM tracks")
+    suspend fun getAllTracks(): List<TrackEntity>
 
 }

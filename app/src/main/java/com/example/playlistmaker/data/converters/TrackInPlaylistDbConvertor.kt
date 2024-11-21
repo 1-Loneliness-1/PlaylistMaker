@@ -19,19 +19,18 @@ class TrackInPlaylistDbConvertor {
             trackInPlaylist.previewUrl
         )
 
-    fun map(updatedPlaylistId: Long, trackInPlaylist: Track): TrackEntity =
+    fun map(trackInPlaylist: Track): TrackEntity =
         TrackEntity(
-            trackInPlaylist.trackId,
-            updatedPlaylistId,
-            trackInPlaylist.trackName,
-            trackInPlaylist.artistName,
-            trackInPlaylist.trackTimeMillis,
-            trackInPlaylist.collectionName,
-            trackInPlaylist.releaseDate,
-            trackInPlaylist.primaryGenreName,
-            trackInPlaylist.country,
-            trackInPlaylist.artworkUrl100,
-            trackInPlaylist.previewUrl
+            trackId = trackInPlaylist.trackId,
+            trackTitle = trackInPlaylist.trackName,
+            artistName = trackInPlaylist.artistName,
+            trackTimeMillis = trackInPlaylist.trackTimeMillis,
+            album = trackInPlaylist.collectionName,
+            releaseDate = trackInPlaylist.releaseDate,
+            genre = trackInPlaylist.primaryGenreName,
+            country = trackInPlaylist.country,
+            artworkUrl100 = trackInPlaylist.artworkUrl100,
+            previewUrl = trackInPlaylist.previewUrl
         )
 
 }
