@@ -46,37 +46,36 @@ class SearchFragment : Fragment() {
     private var listener: () -> Unit = {}
     private var adapter: TrackAdapter? = null
     private var searchHistoryAdapter: TrackAdapter? = null
-    private var binding: FragmentSearchBinding? = null
+    private var _binding: FragmentSearchBinding? = null
     private var searchJob: Job? = null
     private var previousTextInEditText: String = ""
 
-
     private val viewModel: SearchViewModel by viewModel()
-
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding?.root
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return _binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchEditText = binding?.etSearch
-        clearSearchEditTextButton = binding?.ivClearEditText
-        searchTracksRecycler = binding?.rvTrackSearchList
-        searchHistoryRecycler = binding?.rvSearchHistory
-        noResultsPlaceholder = binding?.ivNothingFoundPlaceholder
-        noInternetPlaceholder = binding?.ivNoInternetPlaceholder
-        errorNothingFoundText = binding?.tvErrorNothingFound
-        errorNoInternetText = binding?.tvErrorNoInternet
-        refreshButton = binding?.bRefreshRequest
-        clearHistoryButton = binding?.bClearSearchHistory
-        youLookedForText = binding?.tvYouLookedFor
-        progressBarTrackListLoading = binding?.pbListOfTracksLoading
+        searchEditText = binding.etSearch
+        clearSearchEditTextButton = binding.ivClearEditText
+        searchTracksRecycler = binding.rvTrackSearchList
+        searchHistoryRecycler = binding.rvSearchHistory
+        noResultsPlaceholder = binding.ivNothingFoundPlaceholder
+        noInternetPlaceholder = binding.ivNoInternetPlaceholder
+        errorNothingFoundText = binding.tvErrorNothingFound
+        errorNoInternetText = binding.tvErrorNoInternet
+        refreshButton = binding.bRefreshRequest
+        clearHistoryButton = binding.bClearSearchHistory
+        youLookedForText = binding.tvYouLookedFor
+        progressBarTrackListLoading = binding.pbListOfTracksLoading
 
         val onItemClickListener: (Track) -> Unit = {
             if (isNotPressed) {
@@ -88,9 +87,7 @@ class SearchFragment : Fragment() {
                 startActivity(playerIntent)
             }
         }
-        val onItemLongClick: (Track) -> Boolean = {
-            true
-        }
+        val onItemLongClick: (Track) -> Unit = { }
         adapter = TrackAdapter(
             onItemClicked = onItemClickListener,
             onLongItemClicked = onItemLongClick

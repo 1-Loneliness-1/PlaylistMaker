@@ -12,7 +12,7 @@ class BottomSheetPlaylistsInteractorImpl(
     private val tracksInPlaylistsRepository: TracksInPlaylistsRepository
 ) : BottomSheetPlaylistsInteractor {
 
-    override fun addNewPlaylistInDatabase(playlist: Playlist) {
+    override suspend fun addNewPlaylistInDatabase(playlist: Playlist) {
         playlistsRepository.insertNewPlaylist(playlist)
     }
 
@@ -20,8 +20,12 @@ class BottomSheetPlaylistsInteractorImpl(
         return playlistsRepository.getAllPlaylists()
     }
 
-    override fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track): Flow<String> {
-        return tracksInPlaylistsRepository.insertNewTrack(updatedPlaylistId, insertedTrack)
+    override fun getAllTracksInPlaylist(selectedPlaylistId: Long): Flow<List<Track>> {
+        return tracksInPlaylistsRepository.getAllTracksInPlaylist(selectedPlaylistId)
+    }
+
+    override suspend fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track) {
+        tracksInPlaylistsRepository.insertNewTrack(updatedPlaylistId, insertedTrack)
     }
 
 }

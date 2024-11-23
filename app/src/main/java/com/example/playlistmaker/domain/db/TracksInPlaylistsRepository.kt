@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface TracksInPlaylistsRepository {
 
-    fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track): Flow<String>
+    suspend fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track)
 
-    fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track)
+    suspend fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track)
 
     fun getTrackInfoById(selectedTrackId: Long): Flow<Track?>
 

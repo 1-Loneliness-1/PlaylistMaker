@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
@@ -37,8 +38,8 @@ class PlaylistFragment : Fragment() {
         binding.rvPlaylists.addItemDecoration(SpacesItemDecoration(requireContext()))
 
         adapter = PlaylistAdapter { selectedPlaylist ->
-            requireActivity().findViewById<BottomNavigationView>(R.id.bnvOnHostActivity).visibility =
-                View.GONE
+            requireActivity().findViewById<BottomNavigationView>(R.id.bnvOnHostActivity).isVisible =
+                false
 
             requireActivity().supportFragmentManager
                 .beginTransaction()
@@ -57,16 +58,16 @@ class PlaylistFragment : Fragment() {
                 when (playlistScreenState) {
                     is PlaylistScreenState.EmptyState -> {
                         adapter?.deleteAllData()
-                        binding.ivPlaylistsNotFoundPlaceholder.visibility = View.VISIBLE
-                        binding.tvPlaylistsNotCreatedYet.visibility = View.VISIBLE
-                        binding.rvPlaylists.visibility = View.GONE
+                        binding.ivPlaylistsNotFoundPlaceholder.isVisible = true
+                        binding.tvPlaylistsNotCreatedYet.isVisible = true
+                        binding.rvPlaylists.isVisible = false
                     }
 
                     is PlaylistScreenState.ContentState -> {
                         adapter?.setData(playlistScreenState.playlists)
-                        binding.ivPlaylistsNotFoundPlaceholder.visibility = View.GONE
-                        binding.tvPlaylistsNotCreatedYet.visibility = View.GONE
-                        binding.rvPlaylists.visibility = View.VISIBLE
+                        binding.ivPlaylistsNotFoundPlaceholder.isVisible = false
+                        binding.tvPlaylistsNotCreatedYet.isVisible = false
+                        binding.rvPlaylists.isVisible = true
                     }
                 }
             }
@@ -74,8 +75,8 @@ class PlaylistFragment : Fragment() {
         viewModel.getAllPlaylistsFromDatabase()
 
         binding.bCreateNewPlaylist.setOnClickListener {
-            requireActivity().findViewById<BottomNavigationView>(R.id.bnvOnHostActivity).visibility =
-                View.GONE
+            requireActivity().findViewById<BottomNavigationView>(R.id.bnvOnHostActivity).isVisible =
+                false
 
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fcvHostActivity, NewPlaylistFragment.newInstance(), null)

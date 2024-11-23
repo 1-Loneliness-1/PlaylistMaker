@@ -84,7 +84,7 @@ class PlaylistAdapter(
                 binding.ivPlaylistCover.setImageResource(R.drawable.song_cover_placeholder)
             }
             binding.tvPlaylistTitle.text = model.playlistTitle
-            binding.tvNumOfTracksInPlaylist.text = model.trackCountInPlaylist.toString().plus(
+            binding.tvNumOfTracksInPlaylist.text = "${model.trackCountInPlaylist}".plus(
                 if (model.trackCountInPlaylist % 10 == 1) " трек"
                 else if (model.trackCountInPlaylist % 10 in 2..4) " трека"
                 else " треков"

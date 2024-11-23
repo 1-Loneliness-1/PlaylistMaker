@@ -1,7 +1,6 @@
 package com.example.playlistmaker.ui.player.activity
 
 import android.os.Bundle
-import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -12,10 +11,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.domain.player.model.AddTrackInPlaylistToastState
 import com.example.playlistmaker.domain.player.model.FavoriteTrackButtonState
 import com.example.playlistmaker.domain.player.model.PlayerState
-import com.example.playlistmaker.domain.player.model.PlaylistsBottomSheetScreenState
 import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.media.activity.NewPlaylistFragment
 import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
@@ -63,21 +60,21 @@ class PlayerActivity : AppCompatActivity() {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
         val playlistsBottomSheetAdapter = PlaylistsAdapter { selectedPlaylist ->
-            viewModel.addTrackInPlaylist(selectedPlaylist.playlistId, currentTrack!!)
+            viewModel.addTrackInPlaylist(
+                selectedPlaylist.playlistId,
+                selectedPlaylist.playlistTitle,
+                currentTrack!!
+            )
         }
         binding.rvAvailablePlaylists.adapter = playlistsBottomSheetAdapter
 
         viewModel.getAddTrackInPlaylistToastStatusLiveData().observe(this) { toastState ->
-            when (toastState) {
-                is AddTrackInPlaylistToastState.Content -> {
-                    val trackWasAdded = toastState.messageForToast[0] == 'Д'
-                    if (trackWasAdded) {
-                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                        viewModel.getAvailablePlaylistsFromDatabase()
-                    }
-                    Toast.makeText(this, toastState.messageForToast, Toast.LENGTH_LONG).show()
-                }
+            val trackWasAdded = toastState.messageForToast[0] == 'Д'
+            if (trackWasAdded) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                viewModel.getAvailablePlaylistsFromDatabase()
             }
+            Toast.makeText(this, toastState.messageForToast, Toast.LENGTH_LONG).show()
         }
 
         viewModel.getPlayerStatusLiveData().observe(this) { playerState ->
@@ -104,11 +101,7 @@ class PlayerActivity : AppCompatActivity() {
 
         viewModel.getPlaylistsBottomSheetStatusLiveData()
             .observe(this) { playlistsBottomSheetScreenState ->
-                when (playlistsBottomSheetScreenState) {
-                    is PlaylistsBottomSheetScreenState.ContentState -> {
-                        playlistsBottomSheetAdapter.setData(playlistsBottomSheetScreenState.availablePlaylists)
-                    }
-                }
+                playlistsBottomSheetAdapter.setData(playlistsBottomSheetScreenState.availablePlaylists)
             }
         viewModel.getAvailablePlaylistsFromDatabase()
 
@@ -158,10 +151,12 @@ class PlayerActivity : AppCompatActivity() {
             }
 
         } else {
-            Toast.makeText(this, "Произошла ошибка!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.error_occurred), Toast.LENGTH_SHORT).show()
         }
 
-        viewModel.preparePlayer(currentTrack?.previewUrl!!, consume)
+        if (viewModel.getPlayerStatusLiveData().value is PlayerState.DefaultState) {
+            viewModel.preparePlayer(currentTrack?.previewUrl!!, consume)
+        }
 
         playStopButton?.setOnClickListener {
             when (viewModel.getPlayerStatusLiveData().value) {
@@ -182,7 +177,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         binding.bNewPlaylist.setOnClickListener {
-            binding.fcvPlayerActivity.visibility = View.VISIBLE
+            binding.fcvPlayerActivity.isVisible = true
             supportFragmentManager
                 .beginTransaction()
                 .replace(R.id.fcvPlayerActivity, NewPlaylistFragment.newInstance())
@@ -192,6 +187,16 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(CURRENT_PLAY_POSITION, currentTrackTime?.text?.toString())
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        currentTrackTime?.text = savedInstanceState.getString(CURRENT_PLAY_POSITION)
+    }
+
     override fun onPause() {
         super.onPause()
         viewModel.pausePlayer()
@@ -199,7 +204,9 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.releasePlayer()
+        if (!isChangingConfigurations) {
+            viewModel.releasePlayer()
+        }
     }
 
     private fun changeStateOfElements(currentState: PlayerState) {
@@ -234,6 +241,7 @@ class PlayerActivity : AppCompatActivity() {
         private const val KEY_FOR_INTENT_DATA = "Selected track"
         private const val NUMBER_OF_DP_FOR_IMAGE_CORNERS_ROUNDING = 8f
         private const val POSITION_NUMBER_OF_YEAR_PUBLICATION = 0
+        private const val CURRENT_PLAY_POSITION = "current_track_time"
     }
 
 }

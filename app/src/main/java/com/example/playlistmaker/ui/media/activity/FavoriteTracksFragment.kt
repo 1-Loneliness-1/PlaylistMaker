@@ -53,9 +53,8 @@ class FavoriteTracksFragment : Fragment() {
                 startActivity(playerIntent)
             }
         }
-        val onLongClickListener: (Track) -> Boolean = {
-            true
-        }
+        val onLongClickListener: (Track) -> Unit = {}
+
         adapter =
             TrackAdapter(onItemClicked = onClickListener, onLongItemClicked = onLongClickListener)
         favoriteTracksRecyclerView?.adapter = adapter

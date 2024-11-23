@@ -6,52 +6,43 @@ import com.example.playlistmaker.domain.db.PlaylistsRepository
 import com.example.playlistmaker.domain.media.model.Playlist
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 
 class PlaylistsRepositoryImpl(
     private val database: AppDatabase,
     private val convertor: PlaylistDbConvertor
 ) : PlaylistsRepository {
 
-    override fun insertNewPlaylist(playlistForInsert: Playlist) {
-        GlobalScope.launch {
-            database.playlistDao().insertNewPlaylist(convertor.map(playlistForInsert))
-        }
+    override suspend fun insertNewPlaylist(playlistForInsert: Playlist) {
+        database.playlistDao().insertNewPlaylist(convertor.map(playlistForInsert))
     }
 
-    override fun updatePlaylist(
+    override suspend fun updatePlaylist(
         updatedPlaylistId: Long,
         updatedPlaylistTitle: String,
         updatedPlaylistDescription: String?,
         updatedPlaylistCoverPath: String?
     ) {
-        GlobalScope.launch {
-            database.playlistDao().updatePlaylist(
-                updatedPlaylistId,
-                updatedPlaylistTitle,
-                updatedPlaylistDescription,
-                updatedPlaylistCoverPath
-            )
-        }
+        database.playlistDao().updatePlaylist(
+            updatedPlaylistId,
+            updatedPlaylistTitle,
+            updatedPlaylistDescription,
+            updatedPlaylistCoverPath
+        )
     }
 
-    override fun deletePlaylist(deletedPlaylistId: Long) {
-        GlobalScope.launch {
-            var isTrackUsed = false
-            val playlistForDelete = database.playlistDao().getPlaylistInfoById(deletedPlaylistId)
+    override suspend fun deletePlaylist(deletedPlaylistId: Long) {
+        var isTrackUsed = false
+        val playlistForDelete = database.playlistDao().getPlaylistInfoById(deletedPlaylistId)
+        database.playlistDao().deletePlaylist(playlistForDelete)
+
+        if (playlistForDelete.listOfTracksInPlaylist != null) {
             val typeOfList = object : TypeToken<MutableList<Long>>() {}.type
             val trackIdsInDeletedPlaylist = Gson().fromJson<MutableList<Long>>(
                 playlistForDelete.listOfTracksInPlaylist,
                 typeOfList
             )
-            database.playlistDao().deletePlaylist(playlistForDelete)
-
-            if (playlistForDelete.listOfTracksInPlaylist != null) {
-
-            }
 
             val allPlaylists = database.playlistDao().getAllPlaylists()
             for (trackId in trackIdsInDeletedPlaylist) {
@@ -78,7 +69,6 @@ class PlaylistsRepositoryImpl(
 
                 isTrackUsed = false
             }
-
         }
     }
 

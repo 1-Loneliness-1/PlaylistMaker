@@ -9,11 +9,11 @@ class FavoriteTracksInteractorImpl(
     private val favoriteTracksRepository: FavoriteTracksRepository
 ) : FavoriteTracksInteractor {
 
-    override fun insertTrackToFavorite(trackForAdd: Track) {
+    override suspend fun insertTrackToFavorite(trackForAdd: Track) {
         favoriteTracksRepository.insertTrackToFavorite(trackForAdd)
     }
 
-    override fun deleteTrackFromFavorites(trackForDel: Track) {
+    override suspend fun deleteTrackFromFavorites(trackForDel: Track) {
         favoriteTracksRepository.deleteTrackFromFavorites(trackForDel)
     }
 

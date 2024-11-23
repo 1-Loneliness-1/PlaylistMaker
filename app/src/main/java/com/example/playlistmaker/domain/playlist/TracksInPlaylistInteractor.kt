@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface TracksInPlaylistInteractor {
 
-    fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track)
+    suspend fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track)
 
-    fun deletePlaylist(deletedPlaylistId: Long)
+    suspend fun deletePlaylist(deletedPlaylistId: Long)
 
     fun getPlaylistInfoById(selectedPlaylistId: Long): Flow<Playlist>
 

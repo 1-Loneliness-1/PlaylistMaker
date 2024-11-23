@@ -1,9 +1,11 @@
 package com.example.playlistmaker.ui.player.view_model
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.player.BottomSheetPlaylistsInteractor
 import com.example.playlistmaker.domain.player.FavoriteTracksInteractor
 import com.example.playlistmaker.domain.player.PlayerInteractor
@@ -19,8 +21,9 @@ import kotlinx.coroutines.launch
 class PlayerViewModel(
     private val playerInteractor: PlayerInteractor,
     private val favoriteTracksInteractor: FavoriteTracksInteractor,
-    private val bottomSheetPlaylistsInteractor: BottomSheetPlaylistsInteractor
-) : ViewModel() {
+    private val bottomSheetPlaylistsInteractor: BottomSheetPlaylistsInteractor,
+    private val application: Application
+) : AndroidViewModel(application) {
 
     private var updateTimeOfTuneJob: Job? = null
 
@@ -28,11 +31,7 @@ class PlayerViewModel(
     private val favorTrackButtonStatusLiveData =
         MutableLiveData<FavoriteTrackButtonState>(FavoriteTrackButtonState.IsNotFavoriteState)
     private val playlistsBottomSheetStatusLiveData =
-        MutableLiveData<PlaylistsBottomSheetScreenState>(
-            PlaylistsBottomSheetScreenState.ContentState(
-                emptyList()
-            )
-        )
+        MutableLiveData(PlaylistsBottomSheetScreenState(emptyList()))
     private val addTrackInPlaylistToastStatusLiveData =
         MutableLiveData<AddTrackInPlaylistToastState>()
 
@@ -52,17 +51,36 @@ class PlayerViewModel(
         updateTimeOfTuneJob?.cancel()
     }
 
-    fun addTrackInPlaylist(selectedPlaylistId: Long, trackForAdd: Track) {
+    fun addTrackInPlaylist(
+        selectedPlaylistId: Long,
+        selectedPlaylistTitle: String,
+        trackForAdd: Track
+    ) {
         viewModelScope.launch {
             bottomSheetPlaylistsInteractor
-                .insertNewTrack(selectedPlaylistId, trackForAdd)
-                .collect { messageForToast ->
+                .getAllTracksInPlaylist(selectedPlaylistId)
+                .collect { listOfTracks ->
                     addTrackInPlaylistToastStatusLiveData.postValue(
-                        AddTrackInPlaylistToastState.Content(
-                            messageForToast
+                        AddTrackInPlaylistToastState(
+                            if (listOfTracks.contains(trackForAdd)) {
+                                application.getString(
+                                    R.string.track_already_in_playlist,
+                                    selectedPlaylistTitle
+                                )
+                            } else {
+                                bottomSheetPlaylistsInteractor.insertNewTrack(
+                                    selectedPlaylistId,
+                                    trackForAdd
+                                )
+                                application.getString(
+                                    R.string.track_was_added_in_playlist,
+                                    selectedPlaylistTitle
+                                )
+                            }
                         )
                     )
                 }
+
         }
     }
 
@@ -72,7 +90,7 @@ class PlayerViewModel(
                 .getAllAvailablePlaylists()
                 .collect { playlists ->
                     playlistsBottomSheetStatusLiveData.postValue(
-                        PlaylistsBottomSheetScreenState.ContentState(playlists)
+                        PlaylistsBottomSheetScreenState(playlists)
                     )
                 }
         }
@@ -126,13 +144,17 @@ class PlayerViewModel(
     }
 
     fun insertFavoriteTrackInDb(trackForInsert: Track) {
-        favoriteTracksInteractor.insertTrackToFavorite(trackForInsert)
-        favorTrackButtonStatusLiveData.postValue(FavoriteTrackButtonState.FavoriteState)
+        viewModelScope.launch {
+            favoriteTracksInteractor.insertTrackToFavorite(trackForInsert)
+            favorTrackButtonStatusLiveData.postValue(FavoriteTrackButtonState.FavoriteState)
+        }
     }
 
     fun deleteTrackFromFavorite(trackForDelete: Track) {
-        favoriteTracksInteractor.deleteTrackFromFavorites(trackForDelete)
-        favorTrackButtonStatusLiveData.postValue(FavoriteTrackButtonState.IsNotFavoriteState)
+        viewModelScope.launch {
+            favoriteTracksInteractor.deleteTrackFromFavorites(trackForDelete)
+            favorTrackButtonStatusLiveData.postValue(FavoriteTrackButtonState.IsNotFavoriteState)
+        }
     }
 
     companion object {

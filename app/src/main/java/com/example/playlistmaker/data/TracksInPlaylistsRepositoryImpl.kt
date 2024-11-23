@@ -6,96 +6,79 @@ import com.example.playlistmaker.domain.db.TracksInPlaylistsRepository
 import com.example.playlistmaker.domain.search.model.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 
 class TracksInPlaylistsRepositoryImpl(
     private val database: AppDatabase,
     private val convertor: TrackInPlaylistDbConvertor
 ) : TracksInPlaylistsRepository {
 
-    override fun insertNewTrack(
-        updatedPlaylistId: Long,
-        insertedTrack: Track
-    ): Flow<String> {
-        return flow {
-            val currentPlaylist = database.playlistDao().getPlaylistInfoById(updatedPlaylistId)
+    override suspend fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track) {
+        val currentPlaylist = database.playlistDao().getPlaylistInfoById(updatedPlaylistId)
 
-            if (currentPlaylist.listOfTracksInPlaylist != null) {
-                val itemType = object : TypeToken<MutableList<Long>>() {}.type
-                val tracksInCurrentPlaylist = Gson().fromJson<MutableList<Long>>(
-                    currentPlaylist.listOfTracksInPlaylist,
-                    itemType
-                )
+        if (currentPlaylist.listOfTracksInPlaylist != null) {
+            val itemType = object : TypeToken<MutableList<Long>>() {}.type
+            val tracksInCurrentPlaylist = Gson().fromJson<MutableList<Long>>(
+                currentPlaylist.listOfTracksInPlaylist,
+                itemType
+            )
 
-                if (tracksInCurrentPlaylist.contains(insertedTrack.trackId)) {
-                    emit("Трек уже добавлен в плейлист ${currentPlaylist.playlistTitle}")
-                } else {
-                    database.trackInPlaylistDao().insertNewTrack(convertor.map(insertedTrack))
-                    tracksInCurrentPlaylist.add(insertedTrack.trackId)
-                    database.trackInPlaylistDao().insertNewTrackInPlaylistTable(
-                        updatedPlaylistId,
-                        Gson().toJson(tracksInCurrentPlaylist)
-                    )
-
-                    emit("Добавлено в плейлист ${currentPlaylist.playlistTitle}")
-                }
-            } else {
-                database.trackInPlaylistDao().insertNewTrack(convertor.map(insertedTrack))
-                database.trackInPlaylistDao().insertNewTrackInPlaylistTable(
-                    updatedPlaylistId,
-                    Gson().toJson(listOf(insertedTrack.trackId))
-                )
-                emit("Добавлено в плейлист ${currentPlaylist.playlistTitle}")
-            }
+            database.trackInPlaylistDao().insertNewTrack(convertor.map(insertedTrack))
+            tracksInCurrentPlaylist.add(insertedTrack.trackId)
+            database.trackInPlaylistDao().insertNewTrackInPlaylistTable(
+                updatedPlaylistId,
+                Gson().toJson(tracksInCurrentPlaylist)
+            )
+        } else {
+            database.trackInPlaylistDao().insertNewTrack(convertor.map(insertedTrack))
+            database.trackInPlaylistDao().insertNewTrackInPlaylistTable(
+                updatedPlaylistId,
+                Gson().toJson(listOf(insertedTrack.trackId))
+            )
         }
     }
 
-    override fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track) {
-        GlobalScope.launch {
-            val currentPlaylist = database.playlistDao().getPlaylistInfoById(selectedPlaylistId)
+    override suspend fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track) {
+        val currentPlaylist = database.playlistDao().getPlaylistInfoById(selectedPlaylistId)
 
-            if (currentPlaylist.listOfTracksInPlaylist != null) {
-                val itemType = object : TypeToken<MutableList<Long>>() {}.type
-                val tracksInCurrentPlaylist = Gson().fromJson<MutableList<Long>>(
-                    currentPlaylist.listOfTracksInPlaylist,
-                    itemType
+        if (currentPlaylist.listOfTracksInPlaylist != null) {
+            val itemType = object : TypeToken<MutableList<Long>>() {}.type
+            val tracksInCurrentPlaylist = Gson().fromJson<MutableList<Long>>(
+                currentPlaylist.listOfTracksInPlaylist,
+                itemType
+            )
+            tracksInCurrentPlaylist.remove(deletedTrack.trackId)
+            if (tracksInCurrentPlaylist.size == 0) {
+                database.trackInPlaylistDao()
+                    .deleteTrackByPlaylistTable(selectedPlaylistId, null)
+            } else {
+                database.trackInPlaylistDao().deleteTrackByPlaylistTable(
+                    selectedPlaylistId,
+                    Gson().toJson(tracksInCurrentPlaylist)
                 )
-                tracksInCurrentPlaylist.remove(deletedTrack.trackId)
-                if (tracksInCurrentPlaylist.size == 0) {
-                    database.trackInPlaylistDao()
-                        .deleteTrackByPlaylistTable(selectedPlaylistId, null)
-                } else {
-                    database.trackInPlaylistDao().deleteTrackByPlaylistTable(
-                        selectedPlaylistId,
-                        Gson().toJson(tracksInCurrentPlaylist)
-                    )
+            }
+        }
+
+        val allPlaylists = database.playlistDao().getAllPlaylists()
+        var isTrackUsed = false
+        for (playlist in allPlaylists) {
+            if (playlist.listOfTracksInPlaylist != null) {
+                val typeOfList = object : TypeToken<MutableList<Long>>() {}.type
+                val trackIdsInPlaylist = Gson().fromJson<MutableList<Long>>(
+                    playlist.listOfTracksInPlaylist,
+                    typeOfList
+                )
+
+                if (trackIdsInPlaylist.contains(deletedTrack.trackId)) {
+                    isTrackUsed = true
+                    break
                 }
             }
+        }
 
-            val allPlaylists = database.playlistDao().getAllPlaylists()
-            var isTrackUsed = false
-            for (playlist in allPlaylists) {
-                if (playlist.listOfTracksInPlaylist != null) {
-                    val typeOfList = object : TypeToken<MutableList<Long>>() {}.type
-                    val trackIdsInPlaylist = Gson().fromJson<MutableList<Long>>(
-                        playlist.listOfTracksInPlaylist,
-                        typeOfList
-                    )
-
-                    if (trackIdsInPlaylist.contains(deletedTrack.trackId)) {
-                        isTrackUsed = true
-                        break
-                    }
-                }
-            }
-
-            if (!isTrackUsed) {
-                database.trackInPlaylistDao().deleteTrack(convertor.map(deletedTrack))
-            }
-
+        if (!isTrackUsed) {
+            database.trackInPlaylistDao().deleteTrack(convertor.map(deletedTrack))
         }
     }
 

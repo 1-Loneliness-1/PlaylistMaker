@@ -9,7 +9,7 @@ class PlaylistsInteractorImpl(
     private val playlistsRepository: PlaylistsRepository
 ) : PlaylistsInteractor {
 
-    override fun insertNewPlaylist(playlist: Playlist) {
+    override suspend fun insertNewPlaylist(playlist: Playlist) {
         playlistsRepository.insertNewPlaylist(playlist)
     }
 
@@ -21,7 +21,7 @@ class PlaylistsInteractorImpl(
         return playlistsRepository.getAllPlaylists()
     }
 
-    override fun updatePlaylist(
+    override suspend fun updatePlaylist(
         updatedPlaylistId: Long,
         updatedPlaylistTitle: String,
         updatedPlaylistDescription: String?,

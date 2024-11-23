@@ -12,11 +12,11 @@ class TracksInPlaylistInteractorImpl(
     private val tracksInPlaylistsRepository: TracksInPlaylistsRepository
 ) : TracksInPlaylistInteractor {
 
-    override fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track) {
+    override suspend fun deleteTrackFromPlaylist(selectedPlaylistId: Long, deletedTrack: Track) {
         tracksInPlaylistsRepository.deleteTrackFromPlaylist(selectedPlaylistId, deletedTrack)
     }
 
-    override fun deletePlaylist(deletedPlaylistId: Long) {
+    override suspend fun deletePlaylist(deletedPlaylistId: Long) {
         playlistsRepository.deletePlaylist(deletedPlaylistId)
     }
 
