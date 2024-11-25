@@ -7,8 +7,10 @@ import androidx.room.Room
 import com.example.playlistmaker.data.FavoriteTracksRepositoryImpl
 import com.example.playlistmaker.data.NetworkClient
 import com.example.playlistmaker.data.PlaylistsRepositoryImpl
+import com.example.playlistmaker.data.TracksInPlaylistsRepositoryImpl
 import com.example.playlistmaker.data.converters.PlaylistDbConvertor
 import com.example.playlistmaker.data.converters.TrackDbConvertor
+import com.example.playlistmaker.data.converters.TrackInPlaylistDbConvertor
 import com.example.playlistmaker.data.db.AppDatabase
 import com.example.playlistmaker.data.mediaplayer.Playable
 import com.example.playlistmaker.data.mediaplayer.PlayerForMusic
@@ -23,6 +25,7 @@ import com.example.playlistmaker.data.settings.SettingsSharPrefRepository
 import com.example.playlistmaker.data.settings.impl.SettingsSharPrefRepositoryImpl
 import com.example.playlistmaker.domain.db.FavoriteTracksRepository
 import com.example.playlistmaker.domain.db.PlaylistsRepository
+import com.example.playlistmaker.domain.db.TracksInPlaylistsRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.factoryOf
@@ -80,5 +83,11 @@ val dataModule = module {
     single<PlaylistsRepository> {
         PlaylistsRepositoryImpl(get(), get())
     }
+
+    single<TracksInPlaylistsRepository> {
+        TracksInPlaylistsRepositoryImpl(get(), get())
+    }
+
+    factory { TrackInPlaylistDbConvertor() }
 
 }

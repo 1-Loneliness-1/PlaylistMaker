@@ -15,6 +15,7 @@ class SettingsViewModel(
     fun getDarkThemeStateLiveData() : LiveData<DarkThemeState> = darkThemeStateLiveData
 
     fun checkDarkThemeState() {
-        darkThemeStateLiveData.postValue(DarkThemeState.DarkTheme(settingsInteractor.getDarkThemeStateFromSharPref()))
+        darkThemeStateLiveData.postValue(DarkThemeState(settingsInteractor.getDarkThemeStateFromSharPref()))
     }
+
 }

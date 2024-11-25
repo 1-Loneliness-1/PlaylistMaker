@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.PlaylistsListItemBinding
@@ -76,12 +77,14 @@ class PlaylistAdapter(
                             )
                         )
                     )
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.ivPlaylistCover)
             } else {
                 binding.ivPlaylistCover.setImageResource(R.drawable.song_cover_placeholder)
             }
             binding.tvPlaylistTitle.text = model.playlistTitle
-            binding.tvNumOfTracksInPlaylist.text = model.trackCountInPlaylist.toString().plus(
+            binding.tvNumOfTracksInPlaylist.text = "${model.trackCountInPlaylist}".plus(
                 if (model.trackCountInPlaylist % 10 == 1) " трек"
                 else if (model.trackCountInPlaylist % 10 in 2..4) " трека"
                 else " треков"

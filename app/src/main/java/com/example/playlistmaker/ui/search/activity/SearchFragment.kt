@@ -19,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.domain.search.model.SearchScreenState
+import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.google.gson.Gson
@@ -45,39 +46,38 @@ class SearchFragment : Fragment() {
     private var listener: () -> Unit = {}
     private var adapter: TrackAdapter? = null
     private var searchHistoryAdapter: TrackAdapter? = null
-    private var binding: FragmentSearchBinding? = null
+    private var _binding: FragmentSearchBinding? = null
     private var searchJob: Job? = null
     private var previousTextInEditText: String = ""
 
-
     private val viewModel: SearchViewModel by viewModel()
-
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
-        return binding?.root
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return _binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        searchEditText = binding?.etSearch
-        clearSearchEditTextButton = binding?.ivClearEditText
-        searchTracksRecycler = binding?.rvTrackSearchList
-        searchHistoryRecycler = binding?.rvSearchHistory
-        noResultsPlaceholder = binding?.ivNothingFoundPlaceholder
-        noInternetPlaceholder = binding?.ivNoInternetPlaceholder
-        errorNothingFoundText = binding?.tvErrorNothingFound
-        errorNoInternetText = binding?.tvErrorNoInternet
-        refreshButton = binding?.bRefreshRequest
-        clearHistoryButton = binding?.bClearSearchHistory
-        youLookedForText = binding?.tvYouLookedFor
-        progressBarTrackListLoading = binding?.pbListOfTracksLoading
+        searchEditText = binding.etSearch
+        clearSearchEditTextButton = binding.ivClearEditText
+        searchTracksRecycler = binding.rvTrackSearchList
+        searchHistoryRecycler = binding.rvSearchHistory
+        noResultsPlaceholder = binding.ivNothingFoundPlaceholder
+        noInternetPlaceholder = binding.ivNoInternetPlaceholder
+        errorNothingFoundText = binding.tvErrorNothingFound
+        errorNoInternetText = binding.tvErrorNoInternet
+        refreshButton = binding.bRefreshRequest
+        clearHistoryButton = binding.bClearSearchHistory
+        youLookedForText = binding.tvYouLookedFor
+        progressBarTrackListLoading = binding.pbListOfTracksLoading
 
-        adapter = TrackAdapter {
+        val onItemClickListener: (Track) -> Unit = {
             if (isNotPressed) {
                 tapDebounce()
                 viewModel.saveNewTrack(it)
@@ -87,9 +87,14 @@ class SearchFragment : Fragment() {
                 startActivity(playerIntent)
             }
         }
+        val onItemLongClick: (Track) -> Unit = { }
+        adapter = TrackAdapter(
+            onItemClicked = onItemClickListener,
+            onLongItemClicked = onItemLongClick
+        )
         searchTracksRecycler?.adapter = adapter
 
-        searchHistoryAdapter = TrackAdapter {
+        val onItemClickListenerForSearchHistoryList: (Track) -> Unit = {
             if (isNotPressed) {
                 tapDebounce()
                 viewModel.saveNewTrack(it)
@@ -100,6 +105,10 @@ class SearchFragment : Fragment() {
                 startActivity(playerIntent)
             }
         }
+        searchHistoryAdapter = TrackAdapter(
+            onItemClicked = onItemClickListenerForSearchHistoryList,
+            onLongItemClicked = onItemLongClick
+        )
         searchHistoryRecycler?.adapter = searchHistoryAdapter
 
         viewModel.getSearchScreenStateLiveData().observe(viewLifecycleOwner) { screenState ->

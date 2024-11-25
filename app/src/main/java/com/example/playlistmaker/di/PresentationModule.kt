@@ -5,6 +5,7 @@ import com.example.playlistmaker.ui.media.view_model.MediaViewModel
 import com.example.playlistmaker.ui.media.view_model.NewPlaylistViewModel
 import com.example.playlistmaker.ui.media.view_model.PlaylistsViewModel
 import com.example.playlistmaker.ui.player.view_model.PlayerViewModel
+import com.example.playlistmaker.ui.playlist.view_model.PlaylistInfoViewModel
 import com.example.playlistmaker.ui.search.view_model.SearchViewModel
 import com.example.playlistmaker.ui.settings.view_model.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -25,5 +26,7 @@ val presentationModule = module {
     viewModelOf(::PlaylistsViewModel)
 
     viewModelOf(::NewPlaylistViewModel)
+
+    viewModelOf(::PlaylistInfoViewModel)
 
 }

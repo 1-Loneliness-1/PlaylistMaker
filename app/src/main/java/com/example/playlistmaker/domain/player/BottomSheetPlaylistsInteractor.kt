@@ -6,10 +6,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface BottomSheetPlaylistsInteractor {
 
-    fun addNewPlaylistInDatabase(playlist: Playlist)
+    suspend fun addNewPlaylistInDatabase(playlist: Playlist)
 
     fun getAllAvailablePlaylists(): Flow<List<Playlist>>
 
-    fun addNewTrackInPlaylist(trackForAdd: Track, selectedPlaylist: Playlist): Flow<String>
+    fun getAllTracksInPlaylist(selectedPlaylistId: Long): Flow<List<Track>>
+
+    suspend fun insertNewTrack(updatedPlaylistId: Long, insertedTrack: Track)
 
 }

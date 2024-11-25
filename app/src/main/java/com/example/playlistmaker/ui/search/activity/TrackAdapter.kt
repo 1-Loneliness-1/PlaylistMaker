@@ -13,7 +13,8 @@ import com.example.playlistmaker.utils.DimenConvertor
 
 class TrackAdapter(
     private var tracks: List<Track> = emptyList(),
-    private val onItemClicked: (Track) -> Unit
+    private val onItemClicked: (Track) -> Unit,
+    private val onLongItemClicked: (Track) -> Unit
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -27,6 +28,10 @@ class TrackAdapter(
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
+        holder.itemView.setOnLongClickListener {
+            onLongItemClicked(tracks[position])
+            true
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")

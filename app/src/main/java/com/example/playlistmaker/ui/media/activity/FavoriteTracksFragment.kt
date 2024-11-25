@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.playlistmaker.databinding.FragmentFavoriteTracksBinding
 import com.example.playlistmaker.domain.media.model.FavoriteTracksScreenState
+import com.example.playlistmaker.domain.search.model.Track
 import com.example.playlistmaker.ui.media.view_model.FavoriteTracksViewModel
 import com.example.playlistmaker.ui.player.activity.PlayerActivity
 import com.example.playlistmaker.ui.search.activity.TrackAdapter
@@ -43,7 +44,7 @@ class FavoriteTracksFragment : Fragment() {
         val noFavoriteTracksPlaceholder: ImageView? = binding?.ivFavoriteTracksNotFoundPlaceholder
         val noFavoriteTracksText: TextView? = binding?.tvFavoriteTracksIsEmpty
 
-        adapter = TrackAdapter {
+        val onClickListener: (Track) -> Unit = {
             if (isNotPressed) {
                 tapDebounce()
 
@@ -52,6 +53,10 @@ class FavoriteTracksFragment : Fragment() {
                 startActivity(playerIntent)
             }
         }
+        val onLongClickListener: (Track) -> Unit = {}
+
+        adapter =
+            TrackAdapter(onItemClicked = onClickListener, onLongItemClicked = onLongClickListener)
         favoriteTracksRecyclerView?.adapter = adapter
 
         viewModel.getFavoriteTracksScreenStateLiveData()
@@ -84,6 +89,11 @@ class FavoriteTracksFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getFavoriteTracksFromBd()
     }
 
     private fun tapDebounce() {
